@@ -1,0 +1,62 @@
+/* File nay dung de chua cac css dung chung cho toan bo he thong */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+*,
+body {
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  user-select: none
+}
+
+
+/* Base styles for the container */
+.container {
+  width: 100%;
+  /* Full width of the viewport */
+  max-width: 1200px;
+  /* Maximum width of 1200px */
+  margin: 0 auto;
+  /* Centers the container horizontally */
+  padding: 20px;
+  /* Padding inside the container */
+  box-sizing: border-box;
+  /* Includes padding in width/height calculation */
+  background-color: #ffffff;
+  /* Optional background color */
+}
+
+/* Responsive styles */
+@media (max-width: 1200px) {
+  .container {
+    padding: 15px;
+    /* Reduce padding for medium screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+    /* Reduce padding further for smaller screens */
+    max-width: 100%;
+    /* Allow the container to take full width */
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 8px;
+    /* Further reduce padding on very small screens */
+  }
+}
+
+
+@media (min-width: 1200px) {
+  span {
+    font-size: 14px;
+  }
+}
+
+.tyest {
+  color: aqua
+}

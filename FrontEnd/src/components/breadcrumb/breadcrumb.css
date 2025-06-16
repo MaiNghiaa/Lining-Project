@@ -1,0 +1,42 @@
+.bread-crumb {
+    background-color: #E1E3E8;
+    padding: 6px 48px 8px 40px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.bread-crumb-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.bread-crumb-item {
+    font-size: 14px;
+    color: #666;
+}
+
+.bread-crumb-item a {
+    color: #0E1C22;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.bread-crumb-item a:hover {
+    color: #666;
+}
+
+.bread-crumb-separator {
+    color: #666;
+    margin: 0 5px;
+}
+
+@media screen and (max-width: 576px) {
+    .bread-crumb {
+        padding: 10px 0;
+    }
+
+    .bread-crumb-item {
+        font-size: 13px;
+    }
+}
