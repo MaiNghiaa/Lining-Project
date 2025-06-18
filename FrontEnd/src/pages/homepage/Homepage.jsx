@@ -231,7 +231,13 @@ export default function Homepage() {
         {/* Flash sale */}
         <div className="flash-sale-wrapper">
           <a href="https://lining.com.vn/collections/pickleball" className="hover-zoom" title="PICKLEBALL">
-            <img alt="flashsale_img.jpg" onerror="this.style.display ='none'" className="lazyloaded" src="//theme.hstatic.net/1000312752/1001368650/14/flashsale_img.jpg?v=68" data-src="//theme.hstatic.net/1000312752/1001368650/14/flashsale_img.jpg?v=68" />
+            <img
+              alt="flashsale_img.jpg"
+              onError={(e) => e.target.style.display = 'none'}
+              className="lazyloaded"
+              src="//theme.hstatic.net/1000312752/1001368650/14/flashsale_img.jpg?v=68"
+              data-src="//theme.hstatic.net/1000312752/1001368650/14/flashsale_img.jpg?v=68"
+            />
           </a>
         </div>
 
@@ -297,7 +303,7 @@ export default function Homepage() {
                           }}
                           onError={(e) => {
                             e.target.onerror = null;
-                            e.target.src = 'https://theme.hstatic.net/1000312752/1001368650/14/default-product.jpg?v=68';
+                            e.target.src = 'https://theme.hstatic.net/1000312752/1001368650/14/slideshow_4.jpg?v=68';
                           }}
                         />
                       </div>
@@ -356,7 +362,7 @@ export default function Homepage() {
                       >
                         <img
                           src={`http://localhost:8055/assets/${item.image_cover.filename_disk}`}
-                          alt
+                          alt="blog-review-img"
                           style={{
                             width: "100%",
                             height: 200,

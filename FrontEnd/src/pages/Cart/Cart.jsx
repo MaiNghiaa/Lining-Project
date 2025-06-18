@@ -94,7 +94,7 @@ export default function Cart() {
                                 <div key={`${item.id}-${item.size}`} className="cart-item">
                                     <img
                                         src={`http://localhost:8055/assets/${item.image}`}
-                                        alt={item.name}
+                                        alt={item.name || 'Product image'}
                                         className="cart-item-image"
                                     />
                                     <div className="cart-item-details">

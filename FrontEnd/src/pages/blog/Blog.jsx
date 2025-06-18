@@ -20,7 +20,7 @@ const Blog = () => {
             setBlogPosts(data);
             console.log(data);
         });
-    }, []);
+    }, [slug]);
 
 
     return (

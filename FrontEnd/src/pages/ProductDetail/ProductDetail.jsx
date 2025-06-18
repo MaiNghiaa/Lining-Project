@@ -4,8 +4,9 @@ import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import { getDetailItemById, getItemByCollection } from '../../services/blogService';
 import './ProductDetail.css';
 import getPageInfo from '../../utils/pageInfo';
-import { useCart } from '../../contexts/CartContext';
+import { useCart, CartContext } from '../../contexts/CartContext';
 import SizeGuideModal from '../../components/SizeGuideModal/SizeGuideModal';
+import { useContext } from 'react';
 
 export default function ProductDetail() {
     const { id, path } = useParams();
@@ -17,7 +18,7 @@ export default function ProductDetail() {
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState('description');
     const [relatedProducts, setRelatedProducts] = useState([]);
-    const { addToCart } = useCart();
+    const { addToCart, clearCart, updateCartCount } = useCart();
     const isMounted = useRef(true);
     const pageInfor = getPageInfo(path);
     const breadcrumbItems = product ? [
@@ -26,6 +27,7 @@ export default function ProductDetail() {
     ] : [];
     const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
     const [selectedColor, setSelectedColor] = useState('');
+    const { cartCount } = useContext(CartContext);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -82,24 +84,24 @@ export default function ProductDetail() {
     };
 
     const handleAddToCart = () => {
-        if (!selectedSize) {
-            alert('Vui lòng chọn kích thước');
-            return;
-        }
+        // if (!selectedSize) {
+        //     alert('Vui lòng chọn kích thước');
+        //     return;
+        // }
 
-        if (!selectedColor) {
-            alert('Vui lòng chọn màu sắc');
-            return;
-        }
+        // if (!selectedColor) {
+        //     alert('Vui lòng chọn màu sắc');
+        //     return;
+        // }
 
         const cartItem = {
             id: `${product.ma_san_pham}_${selectedColor}_${selectedSize}`,
             productId: product.ma_san_pham,
             name: product.name,
             price: product.price,
-            size: selectedSize,
+            size: selectedSize || null,
             quantity: quantity,
-            color: selectedColor,
+            color: selectedColor || null,
             image: product.image.filename_disk,
             ma_san_pham: product.ma_san_pham,
             type: product.type || 'Vợt Pick',
@@ -119,12 +121,26 @@ export default function ProductDetail() {
         // Lưu vào giỏ hàng
         handleAddToCart();
 
+        // Cập nhật lại số lượng trên icon
+        updateCartCount();
+
         // Chuyển hướng đến trang thanh toán
         navigate('/checkout');
     };
 
     const openSizeGuide = () => setIsSizeGuideOpen(true);
     const closeSizeGuide = () => setIsSizeGuideOpen(false);
+
+    const handleOrderSuccess = () => {
+        // Xóa giỏ hàng trong localStorage (nếu có)
+        localStorage.removeItem('cartItems');
+        // Xóa giỏ hàng trong context
+        clearCart();
+        // Cập nhật lại số lượng trên icon
+        updateCartCount();
+        // Chuyển hướng sang trang thành công
+        navigate('/order-success');
+    };
 
     if (loading) {
         return <div className="loading">Đang tải...</div>;
@@ -346,7 +362,7 @@ export default function ProductDetail() {
                                     className="product-related-img"
                                     onError={(e) => {
                                         e.target.onerror = null;
-                                        e.target.src = 'https://theme.hstatic.net/1000312752/1001368650/14/default-product.jpg?v=68';
+                                        e.target.src = 'https://theme.hstatic.net/1000312752/1001368650/14/slideshow_4.jpg?v=68';
                                     }}
                                 />
                                 <div className="product-related-name">{product.name}</div>

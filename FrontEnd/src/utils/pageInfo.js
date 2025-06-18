@@ -30,7 +30,27 @@ export default function getPageInfo(slug) {
         title: 'Pickleball',
         breadcrumbLabel: 'Pickleball'
       };
-    default:
+      case 'wade':
+      return {
+        title: 'WADE',
+        breadcrumbLabel: 'WADE'
+      };
+      case 'badfive':
+      return {
+        title: 'BADFIVE',
+        breadcrumbLabel: 'BADFIVE'
+      };
+      case 'lifestyles':
+        return {
+          title: 'LIFESTYLES',
+          breadcrumbLabel: 'LIFESTYLES'
+        };
+      case 'isaac':
+        return {
+          title: 'ISAAC',
+          breadcrumbLabel: 'ISAAC'
+        };
+        default:
       return {
         title: 'Cầu lông',
         breadcrumbLabel: 'Cầu lông'

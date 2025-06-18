@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import './Payment.css';
 import { createOrder } from '../../services/orderService';
+import { sendOrderConfirmationEmail } from '../../services/emailService';
 
 export default function Payment() {
     const navigate = useNavigate();
@@ -66,7 +67,19 @@ export default function Payment() {
 
             // Create order
             const response = await createOrder(orderData);
-            console.log(response);
+            console.log('Order created:', response);
+
+            // Add order number to orderData
+            orderData.orderNumber = response.data.id;
+
+            // Send confirmation email
+            try {
+                await sendOrderConfirmationEmail(orderData);
+                console.log('Confirmation email sent successfully');
+            } catch (emailError) {
+                console.error('Error sending confirmation email:', emailError);
+                // Continue with order process even if email fails
+            }
 
             // Clear cart and user data after successful order
             localStorage.removeItem('cart');
@@ -76,7 +89,7 @@ export default function Payment() {
             navigate('/order-success');
         } catch (error) {
             console.error('Error creating order:', error);
-            // Handle error appropriately
+            alert('Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại sau.');
         }
     };
 

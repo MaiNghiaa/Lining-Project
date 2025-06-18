@@ -1,4 +1,6 @@
 import axios from 'axios';
+import api from './api';
+import emailjs from '@emailjs/browser';
 
 const API_URL =  'http://localhost:5000';
 
@@ -27,6 +29,29 @@ export const subscribeNewsletter = async (email) => {
             success: false,
             error: error.message || 'Có lỗi xảy ra khi đăng ký'
         };
+    }
+};
+
+export const sendOrderConfirmationEmail = async (orderData) => {
+    console.log(orderData);
+    try {
+        const templateParams = {
+            to_email: orderData.email,
+            from_name: 'Li-Ning Sport Vietnam',
+            status: `đã được xác nhận`,
+            // reply_to: orderData.email,
+        };
+        const response = await emailjs.send(
+            "service_okoserm",
+            "template_qc34e4s",
+            templateParams,
+            "RJYgH5x8Gi6zb8-vN"
+        );
+
+        return response;
+    } catch (error) {
+        console.error('Error sending order confirmation email:', error);
+        throw error;
     }
 };
 

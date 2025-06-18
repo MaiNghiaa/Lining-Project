@@ -42,7 +42,7 @@ const Header = ({ onSearchClick }) => {
   const handleMouseLeave = () => {
     const timer = setTimeout(() => {
       setActiveDropdown(null);
-    }, 300); // 300ms delay
+    }, 100); // Giảm delay xuống 100ms
     setDropdownTimer(timer);
   };
 
@@ -50,6 +50,12 @@ const Header = ({ onSearchClick }) => {
     if (window.innerWidth <= 768) {
       setActiveDropdown(activeDropdown === index ? null : index);
     }
+  };
+
+  const handleNavigation = (path) => {
+    setActiveDropdown(null);
+    setIsMobileMenuOpen(false);
+    navigate(path);
   };
 
   const toggleMobileMenu = () => {
@@ -72,12 +78,12 @@ const Header = ({ onSearchClick }) => {
     },
     {
       title: 'Thời trang',
-      path: '/thoi-trang',
+      path: '/collection',
       dropdownItems: [
-        { title: 'WADE', path: '/thoi-trang/wade' },
-        { title: 'BADFIVE', path: '/thoi-trang/badfive' },
-        { title: 'LIFESTYLES', path: '/thoi-trang/lifestyles' },
-        { title: 'ISAAC', path: '/thoi-trang/isaac' }
+        { title: 'WADE', path: '/collection/wade' },
+        { title: 'BADFIVE', path: '/collection/badfive' },
+        { title: 'LIFESTYLES', path: '/collection/lifestyles' },
+        { title: 'ISAAC', path: '/collection/isaac' }
       ]
     },
     {
@@ -128,7 +134,7 @@ const Header = ({ onSearchClick }) => {
                       {item.title}
                     </div>
                   ) : (
-                    <Link to={item.path} className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Link to={item.path} className="nav-link" onClick={() => handleNavigation(item.path)}>
                       <div>{item.title}</div>
                     </Link>
                   )}
@@ -137,7 +143,9 @@ const Header = ({ onSearchClick }) => {
                       <ul className="dropdown-list">
                         {item.dropdownItems.map((dropdownItem, dropdownIndex) => (
                           <li key={dropdownIndex} className="dropdown-item">
-                            <Link to={dropdownItem.path} className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>{dropdownItem.title}</Link>
+                            <Link to={dropdownItem.path} className="nav-link" onClick={() => handleNavigation(dropdownItem.path)}>
+                              {dropdownItem.title}
+                            </Link>
                           </li>
                         ))}
                       </ul>

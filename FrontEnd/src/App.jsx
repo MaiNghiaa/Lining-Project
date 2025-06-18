@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import './App.css'
 import Homepage from './pages/homepage/Homepage'
 import Collection from './pages/Collection/Collection'
@@ -16,6 +16,17 @@ import Checkout from './pages/Checkout/Checkout';
 import Payment from './pages/Payment/Payment';
 import { CartProvider } from './contexts/CartContext';
 import OrderSuccess from './pages/OrderSuccess/OrderSuccess';
+
+// Tạo một component wrapper để force re-render khi location thay đổi
+const BlogWrapper = () => {
+  const location = useLocation();
+  return <Blog key={location.pathname} />;
+};
+
+const BlogDetailWrapper = () => {
+  const location = useLocation();
+  return <BlogDetail key={location.pathname} />;
+};
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -74,8 +85,8 @@ function App() {
               <Route path="/collection" element={<Collection />} />
               <Route path="/collection/:path" element={<Collection />} />
               <Route path="/collection/:path/:id" element={<ProductDetail />} />
-              <Route path="/blogs/:slug" element={<Blog />} />
-              <Route path="/blogs/:slug/:id" element={<BlogDetail />} />
+              <Route path="/blogs/:slug" element={<BlogWrapper />} />
+              <Route path="/blogs/:slug/:id" element={<BlogDetailWrapper />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/cart" element={<Cart />} />
