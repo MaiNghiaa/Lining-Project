@@ -1,0 +1,244 @@
+/* CSS cho form đăng nhập/đăng ký hiện đại */
+.auth-form-container {
+    max-width: 400px;
+    margin: 48px auto;
+    padding: 32px 28px 28px 28px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.10);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.auth-form-container h2 {
+    margin-bottom: 24px;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #c54934;
+    letter-spacing: 1px;
+}
+
+.auth-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.auth-input {
+    padding: 12px 14px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 1rem;
+    flex: 1;
+    transition: border 0.2s;
+    outline: none;
+    background: #fafbfc;
+}
+
+.auth-input:focus {
+    border: 1.5px solid #c54934;
+    background: #fff;
+}
+
+.auth-btn {
+    padding: 12px 0;
+    background: linear-gradient(90deg, #c54934 60%, #e05a3c 100%);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px 0 rgba(197, 73, 52, 0.08);
+}
+
+.auth-btn:hover {
+    background: linear-gradient(90deg, #a53a28 60%, #c54934 100%);
+    box-shadow: 0 4px 16px 0 rgba(197, 73, 52, 0.12);
+}
+
+.register-form-outer {
+    max-width: 800px;
+    margin: 48px auto 0 auto;
+    text-align: center;
+    padding: 50px 0 40px 0;
+}
+
+.register-title {
+    margin-bottom: 24px;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #c54934;
+    letter-spacing: 1px;
+}
+
+.auth-row {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+}
+
+.auth-row-names .auth-input {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+@media (max-width: 600px) {
+    .register-form-outer {
+        padding: 32px 0 24px 0;
+        max-width: 98vw;
+    }
+
+    .auth-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+@media (min-width: 1600px) {
+
+    .register-form-outer,
+    .auth-form-container {
+        max-width: 650px;
+        padding: 70px 0 60px 0;
+    }
+
+    .auth-form {
+        gap: 28px;
+    }
+
+    .auth-input {
+        font-size: 1.15rem;
+        padding: 18px 18px;
+    }
+
+    .auth-btn {
+        font-size: 1.25rem;
+        padding: 18px 0;
+    }
+
+    .register-title,
+    .auth-form-container h2 {
+        font-size: 2.5rem;
+    }
+}
+
+.auth-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+    flex: 1;
+    width: 100%;
+}
+
+.auth-input-icon {
+    position: absolute;
+    left: 14px;
+    color: #c54934;
+    font-size: 1.2rem;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.auth-input-group .auth-input {
+    padding-left: 40px;
+}
+
+.login-title {
+    margin-bottom: 24px;
+    width: 100%;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #c54934;
+    letter-spacing: 1px;
+}
+
+.auth-link-row {
+    margin-top: 12px;
+    text-align: right;
+}
+
+.auth-link {
+    color: #c54934;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.auth-link:hover {
+    color: #a53a28;
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+    .auth-input-group .auth-input {
+        padding-left: 38px;
+    }
+
+    .auth-link-row {
+        text-align: center;
+    }
+}
+
+.login-form-box {
+    box-shadow: 0 4px 24px 0 rgba(197, 73, 52, 0.08);
+    border-radius: 16px;
+    padding: 40px 36px 32px 36px;
+    background: #fff;
+    max-width: 500px;
+    margin: 56px auto 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.auth-logo {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    margin-bottom: 18px;
+}
+
+.auth-desc {
+    color: #666;
+    font-size: 1.08rem;
+    margin-bottom: 18px;
+    margin-top: -8px;
+}
+
+.big-btn {
+    font-size: 1.18rem;
+    padding: 15px 0;
+    border-radius: 8px;
+    margin-top: 8px;
+}
+
+.auth-bottom-text {
+    margin-top: 22px;
+    color: #444;
+    font-size: 1rem;
+}
+
+@media (max-width: 600px) {
+    .login-form-box {
+        padding: 24px 8px 18px 8px;
+        max-width: 98vw;
+    }
+
+    .auth-logo {
+        width: 48px;
+        height: 48px;
+    }
+
+    .auth-desc {
+        font-size: 0.98rem;
+    }
+
+    .auth-bottom-text {
+        font-size: 0.95rem;
+    }
+}

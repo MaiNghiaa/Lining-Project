@@ -1,13 +1,4 @@
-/* Container styles */
-.container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
-}
+
 
 /* Slideshow styles */
 .slideshow-container {
@@ -189,6 +180,30 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
+}
+
+@media screen and (min-width: 1920px) {
+    .blog-review-list {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .blog-review-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media screen and (max-width: 992px) {
+    .blog-review-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .blog-review-list {
+        grid-template-columns: 1fr;
+    }
 }
 
 .blog-review-item {

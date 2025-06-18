@@ -9,11 +9,7 @@
         width: 100%;
     }
 
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 15px;
-    }
+
 
     .ega_list {
         display: grid;
@@ -205,4 +201,72 @@
     .navigate_link_ega_text {
         color: #288ad6;
         text-decoration: none;
+    }
+
+    .newsletter-form {
+        margin-top: 15px;
+    }
+
+    .form-group {
+        display: flex;
+        gap: 10px;
+        max-width: 500px;
+    }
+
+    .newsletter-input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+    }
+
+    .newsletter-input:focus {
+        outline: none;
+        border-color: #e31837;
+    }
+
+    .newsletter-submit {
+        padding: 10px 20px;
+        background-color: #e31837;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+    }
+
+    .newsletter-submit:hover {
+        background-color: #c41530;
+    }
+
+    .status-message {
+        margin-top: 10px;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .status-message.success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .status-message.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    @media (max-width: 768px) {
+        .form-group {
+            flex-direction: column;
+        }
+
+        .newsletter-submit {
+            width: 100%;
+        }
     }

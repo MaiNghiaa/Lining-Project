@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import "./homepage.css";
 import { Link } from "react-router-dom";
+import { getFeaturedEvents, getNewArrival } from '../../services/blogService';
 
 export default function Homepage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
   const itemsPerGroup = 7;
-
+  const [newsEvents, setNewsEvents] = useState([]);
+  const [eventsTechnology, setEventsTechnology] = useState([]);
+  const [newArrival, setNewArrival] = useState([]);
   const slides = [
     {
       id: 1,
@@ -38,76 +41,67 @@ export default function Homepage() {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    getFeaturedEvents("Sự kiện nổi bật").then(data => {
+      setNewsEvents(data);
+      console.log(data);
+    });
+    getFeaturedEvents("Công nghệ sản phẩm", 3).then(data => {
+      setEventsTechnology(data);
+      console.log(data);
+    });
+    getNewArrival().then(data => {
+      setNewArrival(data);
+      console.log(data);
+    });
+  }, []);
+
   const itemsNav = [
     {
       id: 1,
       name: "PICKLEBALL",
       iamge: "https://theme.hstatic.net/1000312752/1001368650/14/groupbuy_1_img_large.jpg?v=68",
+      path: 'pickleball'
     },
 
     {
       id: 2,
       name: "Chạy Bộ",
       iamge: "https://theme.hstatic.net/1000312752/1001368650/14/groupbuy_4_img_large.jpg?v=68",
+      path: 'chay-bo'
     },
     {
       id: 3,
       name: "Traning",
       iamge: "https://theme.hstatic.net/1000312752/1001368650/14/groupbuy_6_img_large.jpg?v=68",
+      path: 'tap-luyen'
     },
     {
       id: 4,
       name: "Bóng rổ",
       iamge: "https://theme.hstatic.net/1000312752/1001368650/14/groupbuy_7_img_large.jpg?v=68",
+      path: 'bong-ro'
     },
     {
       id: 5,
       name: "Cầu lông",
       iamge: "https://theme.hstatic.net/1000312752/1001368650/14/groupbuy_8_img_large.jpg?v=68",
+      path: 'cau-long'
     },
     {
       id: 6,
       name: "Bóng Đá",
       iamge: "https://theme.hstatic.net/1000312752/1001368650/14/groupbuy_10_img_large.jpg?v=68",
+      path: 'bong-da'
     },
     {
       id: 7,
       name: "Bóng bàn",
       iamge: "https://theme.hstatic.net/1000312752/1001368650/14/groupbuy_11_img_large.jpg?v=68",
+      path: 'golf'
     },
   ];
-  const hinhanhnoibat = [
-    {
-      img: "https://file.hstatic.net/1000312752/article/2_cdf9066abcad4d319fec552b1469a54d_medium.jpg",
-    },
-    {
-      img: "https://file.hstatic.net/1000312752/article/img_8901_68eef96b153d4664a433520aeb81039f_medium.jpg",
-    },
-    {
-      img: "https://file.hstatic.net/1000312752/article/img_0875_55cfc2ffb2904c2bbc4222a499901409_medium.jpg",
-    },
-    {
-      img: "https://file.hstatic.net/1000312752/article/img_1306_a89ae558f9544551a6942718fe24b964_medium.jpg",
-    },
-    {
-      img: "https://file.hstatic.net/1000312752/article/_mg_8369_21c01fa501324c028fa35b4f3880e7ba_medium.jpg",
-    },
-    {
-      img: "https://file.hstatic.net/1000312752/article/1202a426.1001_d34891be2a0e494898c3c9e6592dee91_medium.jpg",
-    },
-    {
-      img: "https://file.hstatic.net/1000312752/article/1202a426.1002_cfd3a2fd3678448da7cb476786033450_medium.jpg",
-    },
-    {
-      img: "https://file.hstatic.net/1000312752/article/_nam7405_54d16093623f4016b8478b34f6b79fb0_medium.jpg",
-    },
-    {
-      img: "https://file.hstatic.net/1000312752/article/marius_kimutai_-_1st__2.05.06__marato_barcelona_f0dd8d2ea127461b89ee054f3cd333e3_medium.jpg",
-    },
-    {
-      img: "https://file.hstatic.net/1000312752/article/3q7a3063_6d307dd7160d4b7384cd55701afd54bd_medium.jpg",
-    },
-  ];
+
 
   const handlePrevGroup = () => {
     setCurrentGroupIndex((prev) =>
@@ -158,14 +152,19 @@ export default function Homepage() {
             </button>
             <div className="groupbuy-list">
               {getCurrentGroup().map((item) => (
-                <div className="groupbuy-item" key={item.id}>
-                  <img
-                    src={item.iamge}
-                    alt={item.name}
-                    className="groupbuy-item-img"
-                    style={{ minWidth: 95, width: "100%", height: "100%", objectFit: "cover" }}
-                  />
-                </div>
+                <Link
+                  to={`/collection/${item.path}`}
+                  key={item.id}
+                >
+                  <div className="groupbuy-item">
+                    <img
+                      src={item.iamge}
+                      alt={item.name}
+                      className="groupbuy-item-img"
+                      style={{ minWidth: 95, width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  </div>
+                </Link>
               ))}
             </div>
             <button className="nav-btn next" onClick={handleNextGroup}>
@@ -237,97 +236,38 @@ export default function Homepage() {
                     </p>
                   </div>
                 </div>
-                <div className="readytowear-items pd-item">
-                  <div
-                    className="readytowear-img"
-                    style={{ width: 255, height: 255 }}
-                  >
-                    <img
-                      src="https://product.hstatic.net/1000312752/product/cdf10ca566464ae3a32fea53a1633bb5c9e14993783480a92007f3b38624078f777ed3_3a339d23d91c44e08fbbc9007cbd7a1d.jpg"
-                      alt
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  </div>
-                  <div className="readytowear-desc">
-                    <h3 style={{ margin: "10px 0px" }}>
-                      Áo T-Shirt nữ ATST792-3V
-                    </h3>
-                    <p
-                      style={{
-                        paddingBottom: 10,
-                        color: "#c54934",
-                        fontWeight: 600,
-                      }}
+                {newArrival.map((item, index) => {
+                  return <div className="readytowear-items pd-item" key={item.ma_san_pham}>
+                    <div
+                      className="readytowear-img"
+                      style={{ width: 255, height: 255 }}
                     >
-                      608,727₫
-                    </p>
+                      <img
+                        src={`http://localhost:8055/assets/${item.image.filename_disk}`}
+                        alt
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </div>
+                    <div className="readytowear-desc">
+                      <h3 style={{ margin: "10px 0px" }}>
+                        {item.name}
+                      </h3>
+                      <p
+                        style={{
+                          paddingBottom: 10,
+                          color: "#c54934",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {item.price}₫
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="readytowear-items pd-item">
-                  <div
-                    className="readytowear-img"
-                    style={{ width: 255, height: 255 }}
-                  >
-                    <img
-                      src="https://product.hstatic.net/1000312752/product/cdf10ca566464ae3a32fea53a1633bb5c9e14993783480a92007f3b38624078f777ed3_3a339d23d91c44e08fbbc9007cbd7a1d.jpg"
-                      alt
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  </div>
-                  <div className="readytowear-desc">
-                    <h3 style={{ margin: "10px 0px" }}>
-                      Áo T-Shirt nữ ATST792-3V
-                    </h3>
-                    <p
-                      style={{
-                        paddingBottom: 10,
-                        color: "#c54934",
-                        fontWeight: 600,
-                      }}
-                    >
-                      608,727₫
-                    </p>
-                  </div>
-                </div>
-                <div className="readytowear-items pd-item">
-                  <div
-                    className="readytowear-img"
-                    style={{ width: 255, height: 255 }}
-                  >
-                    <img
-                      src="https://product.hstatic.net/1000312752/product/cdf10ca566464ae3a32fea53a1633bb5c9e14993783480a92007f3b38624078f777ed3_3a339d23d91c44e08fbbc9007cbd7a1d.jpg"
-                      alt
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  </div>
-                  <div className="readytowear-desc">
-                    <h3 style={{ margin: "10px 0px" }}>
-                      Áo T-Shirt nữ ATST792-3V
-                    </h3>
-                    <p
-                      style={{
-                        paddingBottom: 10,
-                        color: "#c54934",
-                        fontWeight: 600,
-                      }}
-                    >
-                      608,727₫
-                    </p>
-                  </div>
-                </div>
-
+                })}
               </div>
               <div
                 style={{
@@ -350,7 +290,7 @@ export default function Homepage() {
             </div>
             <div className="blog_review__grid">
               <div className="blog-review-list">
-                {hinhanhnoibat.map((item, index) => {
+                {newsEvents.map((item, index) => {
                   return (
                     <div className="blog-review-items" key={index}>
                       <div
@@ -358,7 +298,7 @@ export default function Homepage() {
                         style={{ width: "100%", height: "200px" }}
                       >
                         <img
-                          src={item.img}
+                          src={`http://localhost:8055/assets/${item.image_cover.filename_disk}`}
                           alt
                           style={{
                             width: "100%",
@@ -386,85 +326,38 @@ export default function Homepage() {
             </div>
             <div className="homeblog_wapper">
               <div className="homeblog_list">
-                <div className="homeblog_item">
-                  <div className="homeblog_img" style={{}}>
-                    <img
-                      src="https://file.hstatic.net/1000312752/article/pop-up_bbf3597f6fbc46e1b00c96918e2c3cb8_large.png"
-                      alt="homeblog-item-img"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  </div>
-                  <div className="text-item-homelog">
-                    <p
-                      style={{
-                        fontSize: 20,
-                        lineHeight: "1.5",
-                        marginBottom: 8,
-                      }}
-                    >
-                      CHITU 8/CHITU 8 PRO – MỘT ĐÔI GIÀY, MỌI HÀNH TRÌNH
-                    </p>
-                    <h2 style={{ fontSize: 16, lineHeight: "1.5" }}>
-                      Ra mắt phiên bản 2025 – CHITU 8 và CHITU 8 PRO!🌟 Một lựa chọn...
-                    </h2>
-                  </div>
-                </div>
-                <div className="homeblog_item">
-                  <div className="homeblog_img" style={{}}>
-                    <img
-                      src="https://file.hstatic.net/1000312752/article/pop-up_bbf3597f6fbc46e1b00c96918e2c3cb8_large.png"
-                      alt="homeblog-item-img"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  </div>
-                  <div className="text-item-homelog">
-                    <p
-                      style={{
-                        fontSize: 20,
-                        lineHeight: "1.5",
-                        marginBottom: 8,
-                      }}
-                    >
-                      SUPER LIGHT – RA MẮT PHIÊN BẢN 22 HOÀN TOÀN MỚI
-                    </p>
-                    <h2 style={{ fontSize: 16, lineHeight: "1.5" }}>Super Light trở lại với phiên bản 22 cùng công nghệ và thiết kế khác...</h2>
-                  </div>
-                </div>
-                <div className="homeblog_item">
-                  <div className="homeblog_img" style={{}}>
-                    <img
-                      src="https://file.hstatic.net/1000312752/article/pop-up_bbf3597f6fbc46e1b00c96918e2c3cb8_large.png"
-                      alt="homeblog-item-img"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  </div>
-                  <div className="text-item-homelog">
-                    <p
-                      style={{
-                        fontSize: 20,
-                        lineHeight: "1.5",
-                        marginBottom: 8,
-                      }}
-                    >
-                      LI-NING RA MẮT SIÊU PHẨM GIÀY SOFT GO 2 KNIT: THIẾT KẾ
-                    </p>
-                    <h2 style={{ fontSize: 16, lineHeight: "1.5" }}>
-                      [...]
-                    </h2>
-                  </div>
-                </div>
+
+                {eventsTechnology.map((item, index) => {
+                  return (
+                    <Link to={`/blogs/cong-nghe-san-pham/${item.id}`} className="homeblog_item" key={index} style={{ textDecoration: "none", color: "inherit" }}>
+                      <div className="homeblog_img" >
+                        <img
+                          src={`http://localhost:8055/assets/${item.image_cover.filename_disk}`}
+                          alt="homeblog-item-img"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </div>
+                      <div className="text-item-homelog">
+                        <p
+                          style={{
+                            fontSize: 20,
+                            lineHeight: "1.5",
+                            marginBottom: 8,
+                          }}
+                        >
+                          {item.title}
+                        </p>
+                        <h2 style={{ fontSize: 16, lineHeight: "1.5" }}>
+                          {item.description}
+                        </h2>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
               <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                 {/* const breadcrumbItems = [

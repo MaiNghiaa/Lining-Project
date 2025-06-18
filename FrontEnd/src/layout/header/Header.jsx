@@ -1,30 +1,70 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import './header.css'
+import { useCart } from '../../contexts/CartContext'
 
-const Header = () => {
+const Header = ({ onSearchClick }) => {
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { cartItemCount } = useCart();
+
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    const email = localStorage.getItem('user_email');
+    if (token) {
+      setIsLoggedIn(true);
+      setUserEmail(email);
+    } else {
+      setIsLoggedIn(false);
+      setUserEmail('');
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user_email');
+    setIsLoggedIn(false);
+    setUserEmail('');
+    navigate('/login');
+  };
 
   const handleMouseEnter = (index) => {
-    setActiveDropdown(index);
+    if (window.innerWidth > 768) {
+      setActiveDropdown(index);
+    }
   };
 
   const handleMouseLeave = () => {
-    setActiveDropdown(null);
+    if (window.innerWidth > 768) {
+      setActiveDropdown(null);
+    }
+  };
+
+  const handleDropdownClick = (index) => {
+    if (window.innerWidth <= 768) {
+      setActiveDropdown(activeDropdown === index ? null : index);
+    }
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const menuItems = [
     {
       title: 'Thể thao',
-      path: '/the-thao',
+      path: '/collection',
       dropdownItems: [
-        { title: 'Pickleball', path: '/the-thao/pickleball' },
-        { title: 'Chạy bộ', path: '/the-thao/chay-bo' },
-        { title: 'Tập luyện', path: '/the-thao/tap-luyen' },
-        { title: 'Bóng rổ', path: '/the-thao/bong-ro' },
-        { title: 'Cầu lông', path: '/the-thao/cau-long' },
-        { title: 'Bóng đá', path: '/the-thao/bong-da' },
-        { title: 'Golf', path: '/the-thao/golf' }
+        { title: 'Pickleball', path: 'collection/pickleball' },
+        { title: 'Chạy bộ', path: 'collection/chay-bo' },
+        { title: 'Tập luyện', path: 'collection/tap-luyen' },
+        { title: 'Bóng rổ', path: 'collection/bong-ro' },
+        { title: 'Cầu lông', path: 'collection/cau-long' },
+        { title: 'Bóng đá', path: 'collection/bong-da' },
+        { title: 'Golf', path: 'collection/golf' }
       ]
     },
     {
@@ -61,13 +101,13 @@ const Header = () => {
           </Link>
         </div>
 
-        <button className="mobile-menu-btn">
+        <button className="mobile-menu-btn" onClick={toggleMobileMenu}>
           <span></span>
           <span></span>
           <span></span>
         </button>
 
-        <div className="navigation">
+        <div className={`navigation ${isMobileMenuOpen ? 'active' : ''}`}>
           <ul className="nav-list">
             {menuItems.map((item, index) => (
               <li key={index} className="nav-item">
@@ -76,21 +116,25 @@ const Header = () => {
                   onMouseEnter={() => handleMouseEnter(index)}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <Link
-                    to={item.path}
-                    className="nav-link"
-                  >
-                    {item.title}
-                    {/* {item.dropdownItems.length > 0 && (
-                      <i className="las la-chevron-down"></i>
-                    )} */}
-                  </Link>
+                  {item.dropdownItems.length > 0 ? (
+                    <div
+                      className="nav-link"
+                      onClick={() => handleDropdownClick(index)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {item.title}
+                    </div>
+                  ) : (
+                    <Link to={item.path} className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                      <div>{item.title}</div>
+                    </Link>
+                  )}
                   {item.dropdownItems.length > 0 && (
                     <div className={`dropdown-menu ${activeDropdown === index ? 'show' : ''}`}>
                       <ul className="dropdown-list">
                         {item.dropdownItems.map((dropdownItem, dropdownIndex) => (
                           <li key={dropdownIndex} className="dropdown-item">
-                            <Link to={dropdownItem.path} className="nav-link">{dropdownItem.title}</Link>
+                            <Link to={dropdownItem.path} className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>{dropdownItem.title}</Link>
                           </li>
                         ))}
                       </ul>
@@ -100,71 +144,95 @@ const Header = () => {
               </li>
             ))}
           </ul>
+          <div className="mobile-actions">
+            <div className="action-item action-user" style={{ position: 'relative' }}
+              onMouseEnter={() => handleMouseEnter('user')}
+              onMouseLeave={handleMouseLeave}
+            >
+              <img src="https://theme.hstatic.net/1000312752/1001368650/14/icon-user.png?v=68" alt="user" className="action-img" />
+              {activeDropdown === 'user' && (
+                <div className="user-dropdown-menu" style={{ position: 'absolute', top: '100%', right: 0, background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', zIndex: 10, minWidth: 180 }}>
+                  <ul className="user-dropdown-list">
+                    {isLoggedIn ? (
+                      <>
+                        <li className="nav-item-userinfo" style={{ cursor: 'default', color: '#888' }}>
+                          {userEmail}
+                        </li>
+                        <li className="nav-item-logout" onClick={handleLogout}>Đăng xuất</li>
+                      </>
+                    ) : (
+                      <>
+                        <li className="nav-item-login" onClick={() => { setActiveDropdown(null); navigate('/login'); }}>Đăng nhập</li>
+                        <li className="nav-item-register" onClick={() => { setActiveDropdown(null); navigate('/register'); }}>Đăng ký</li>
+                      </>
+                    )}
+                  </ul>
+                </div>
+              )}
+            </div>
+            <div className="action-item action-search">
+              <img
+                src="https://theme.hstatic.net/1000312752/1001368650/14/icon-search.png?v=68"
+                alt="search"
+                className="action-img"
+                style={{ cursor: 'pointer' }}
+                onClick={onSearchClick}
+              />
+            </div>
+            <div className="action-item action-cart" onClick={() => navigate('/cart')}>
+              <img src="https://theme.hstatic.net/1000312752/1001368650/14/icon-bag.png?v=68" alt="cart" className="action-img" />
+              {cartItemCount > 0 && (
+                <span className="cart-count">{cartItemCount}</span>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="actions">
           <div className="action-item action-user" style={{ position: 'relative' }}
-            onMouseEnter={() => setActiveDropdown('user')}
-            onMouseLeave={() => setActiveDropdown(null)}
+            onMouseEnter={() => handleMouseEnter('user')}
+            onMouseLeave={handleMouseLeave}
           >
             <img src="https://theme.hstatic.net/1000312752/1001368650/14/icon-user.png?v=68" alt="user" className="action-img" />
             {activeDropdown === 'user' && (
               <div className="user-dropdown-menu" style={{ position: 'absolute', top: '100%', right: 0, background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', zIndex: 10, minWidth: 180 }}>
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                  <li style={{ padding: '10px 16px', cursor: 'pointer' }} onClick={() => setActiveDropdown('login')}>Đăng nhập</li>
-                  <li style={{ padding: '10px 16px', cursor: 'pointer' }} onClick={() => setActiveDropdown('register')}>Đăng ký</li>
+                <ul className="user-dropdown-list">
+                  {isLoggedIn ? (
+                    <>
+                      <li className="nav-item-userinfo" style={{ cursor: 'default', color: '#888' }}>
+                        {userEmail}
+                      </li>
+                      <li className="nav-item-logout" onClick={handleLogout}>Đăng xuất</li>
+                    </>
+                  ) : (
+                    <>
+                      <li className="nav-item-login" onClick={() => { setActiveDropdown(null); navigate('/login'); }}>Đăng nhập</li>
+                      <li className="nav-item-register" onClick={() => { setActiveDropdown(null); navigate('/register'); }}>Đăng ký</li>
+                    </>
+                  )}
                 </ul>
-              </div>
-            )}
-            {activeDropdown === 'register' && (
-              <div className="user-dropdown-menu" style={{ position: 'absolute', top: '100%', right: 0, background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', zIndex: 10, minWidth: 300, padding: 20 }}
-                onMouseLeave={() => setActiveDropdown(null)}
-              >
-                <RegisterForm />
               </div>
             )}
           </div>
           <div className="action-item action-search">
-            <img src="https://theme.hstatic.net/1000312752/1001368650/14/icon-search.png?v=68" alt="search" className="action-img" />
+            <img
+              src="https://theme.hstatic.net/1000312752/1001368650/14/icon-search.png?v=68"
+              alt="search"
+              className="action-img"
+              style={{ cursor: 'pointer' }}
+              onClick={onSearchClick}
+            />
           </div>
-          <div className="action-item action-cart">
+          <div className="action-item action-cart" onClick={() => navigate('/cart')}>
             <img src="https://theme.hstatic.net/1000312752/1001368650/14/icon-bag.png?v=68" alt="cart" className="action-img" />
+            {cartItemCount > 0 && (
+              <span className="cart-count">{cartItemCount}</span>
+            )}
           </div>
         </div>
       </div>
     </header>
   )
 }
-
-// RegisterForm component
-const RegisterForm = () => {
-  const [form, setForm] = useState({
-    ho: '',
-    ten: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  });
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Đăng ký:', form);
-  };
-
-  return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <input name="ho" placeholder="Họ" value={form.ho} onChange={handleChange} required style={{ padding: 8, border: '1px solid #ccc', borderRadius: 4 }} />
-      <input name="ten" placeholder="Tên" value={form.ten} onChange={handleChange} required style={{ padding: 8, border: '1px solid #ccc', borderRadius: 4 }} />
-      <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} required style={{ padding: 8, border: '1px solid #ccc', borderRadius: 4 }} />
-      <input name="password" type="password" placeholder="Mật khẩu" value={form.password} onChange={handleChange} required style={{ padding: 8, border: '1px solid #ccc', borderRadius: 4 }} />
-      <input name="confirmPassword" type="password" placeholder="Nhập lại mật khẩu" value={form.confirmPassword} onChange={handleChange} required style={{ padding: 8, border: '1px solid #ccc', borderRadius: 4 }} />
-      <button type="submit" style={{ padding: 10, background: '#222', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}>Đăng ký</button>
-    </form>
-  );
-};
 
 export default Header;

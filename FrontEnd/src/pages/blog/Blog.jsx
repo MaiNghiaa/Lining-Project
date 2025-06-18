@@ -1,80 +1,27 @@
-import React from "react";
-import { useParams } from "react-router-dom";
-import Breadcrumb from "../../components/breadcrumb/Breadcrumb";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
 import "./blog.css";
-
+import { getFeaturedEvents } from "../../services/blogService";
+import getPageInfo from "../../utils/pageInfo";
 const Blog = () => {
     const { slug } = useParams();
-    const getPageInfo = (slug) => {
-        switch (slug) {
-            case 'tin-tuc-su-kien':
-                return {
-                    title: 'Tin tức - Sự kiện',
-                    breadcrumbLabel: 'Tin tức - Sự kiện'
-                };
-            case 'tin-khuyen-mai':
-                return {
-                    title: 'Tin khuyến mại',
-                    breadcrumbLabel: 'Tin khuyến mại'
-                };
-            case 'cong-nghe-san-pham':
-                return {
-                    title: 'CÔNG NGHỆ SẢN PHẨM',
-                    breadcrumbLabel: 'CÔNG NGHỆ SẢN PHẨM'
-                };
-            default:
-                return {
-                    title: 'Blog',
-                    breadcrumbLabel: 'Blog'
-                };
-        }
-    };
+    const [blogPosts, setBlogPosts] = useState([]);
+    const navigate = useNavigate();
+
 
     const pageInfo = getPageInfo(slug);
     const breadcrumbItems = [
         { label: pageInfo.breadcrumbLabel, path: `/blogs/${slug}` }
     ];
 
-    const blogPosts = [
-        {
-            id: 1,
-            title: "CHITU 8/CHITU 8 PRO – MỘT ĐÔI GIÀY, MỌI HÀNH TRÌNH",
-            description: "Ra mắt phiên bản 2025 – ",
-            image: "https://file.hstatic.net/1000312752/article/pop-up_bbf3597f6fbc46e1b00c96918e2c3cb8_large.png",
-            date: "15/03/2024"
-        },
-        {
-            id: 2,
-            title: "CHITU 8/CHITU 8 PRO – MỘT ĐÔI GIÀY, MỌI HÀNH TRÌNH",
-            description: "Ra mắt phiên bản 2025 – ",
-            image: "https://file.hstatic.net/1000312752/article/pop-up_bbf3597f6fbc46e1b00c96918e2c3cb8_large.png",
-            date: "15/03/2024"
-        }, {
-            id: 3,
-            title: "CHITU 8/CHITU 8 PRO – MỘT ĐÔI GIÀY, MỌI HÀNH TRÌNH",
-            description: "Ra mắt phiên bản 2025 – ",
-            image: "https://file.hstatic.net/1000312752/article/pop-up_bbf3597f6fbc46e1b00c96918e2c3cb8_large.png",
-            date: "15/03/2024"
-        }, {
-            id: 4,
-            title: "CHITU 8/CHITU 8 PRO – MỘT ĐÔI GIÀY, MỌI HÀNH TRÌNH",
-            description: "Ra mắt phiên bản 2025 – ",
-            image: "https://file.hstatic.net/1000312752/article/pop-up_bbf3597f6fbc46e1b00c96918e2c3cb8_large.png",
-            date: "15/03/2024"
-        }, {
-            id: 5,
-            title: "CHITU 8/CHITU 8 PRO – MỘT ĐÔI GIÀY, MỌI HÀNH TRÌNH",
-            description: "Ra mắt phiên bản 2025 – ",
-            image: "https://file.hstatic.net/1000312752/article/pop-up_bbf3597f6fbc46e1b00c96918e2c3cb8_large.png",
-            date: "15/03/2024"
-        }, {
-            id: 6,
-            title: "CHITU 8/CHITU 8 PRO – MỘT ĐÔI GIÀY, MỌI HÀNH TRÌNH",
-            description: "Ra mắt phiên bản 2025 – ",
-            image: "https://file.hstatic.net/1000312752/article/pop-up_bbf3597f6fbc46e1b00c96918e2c3cb8_large.png",
-            date: "15/03/2024"
-        },
-    ];
+    useEffect(() => {
+        getFeaturedEvents(`${pageInfo.title}`).then(data => {
+            setBlogPosts(data);
+            console.log(data);
+        });
+    }, []);
+
 
     return (
         <div className="blog-page-container">
@@ -84,9 +31,9 @@ const Blog = () => {
                     {/* <h1 className="blog-page-title">{pageInfo.title}</h1> */}
                     <div className="blog-grid">
                         {blogPosts.map((post) => (
-                            <div key={post.id} className="blog-card">
+                            <div key={post.id} className="blog-card" onClick={() => navigate(`/blogs/${slug}/${post.id}`)}>
                                 <div className="blog-image">
-                                    <img src={post.image} alt={post.title} />
+                                    <img src={`http://localhost:8055/assets/${post.image_cover.filename_disk}`} alt={post.title} />
                                 </div>
                                 <div className="blog-content">
                                     <span className="blog-date">{post.date}</span>
