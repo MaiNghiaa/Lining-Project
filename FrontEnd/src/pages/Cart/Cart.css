@@ -216,6 +216,30 @@
     margin-bottom: 20px;
 }
 
+.cart-item-variants {
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.variant-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.variant-label {
+    color: #666;
+    min-width: 70px;
+}
+
+.variant-value {
+    color: #333;
+    font-weight: 500;
+}
+
 @media (max-width: 768px) {
     .cart-content {
         grid-template-columns: 1fr;

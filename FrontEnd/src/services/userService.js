@@ -1,10 +1,8 @@
 import api from './api';
-
-export const registerUser = (payload, token) => {
+export const registerUser = (payload) => {
   return api.post('/users', payload, {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
     }
   });
 };

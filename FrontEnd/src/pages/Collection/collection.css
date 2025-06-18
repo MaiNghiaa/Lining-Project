@@ -132,7 +132,6 @@
 
 /* Staggered animation for filter options */
 .filter-options {
-
   color: rgba(14, 28, 34, 0.7);
   font-size: 16px;
   line-height: 24px;
@@ -146,7 +145,6 @@
   max-height: 500px;
   opacity: 1;
 }
-
 
 /* Delay for each option */
 .filter-option:nth-child(1) {
@@ -189,7 +187,6 @@
   animation-delay: 0.55s;
 }
 
-
 .sort-select {
   transition: all 0.3s ease;
 }
@@ -216,7 +213,6 @@
   padding-right: 12px;
   background: transparent;
   border-radius: 8px;
-
 }
 
 .product-info {
@@ -251,7 +247,6 @@
   align-items: center;
   cursor: pointer;
   padding-top: 8px;
-
   transition: all 0.3s ease;
 }
 
@@ -284,18 +279,104 @@
   align-items: center;
   margin-bottom: 8px;
   cursor: pointer;
-  color: #666;
-  font-size: 14px;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
+.filter-option:hover {
+  color: #ff4d4d;
+}
 
 .filter-option input[type="checkbox"] {
-  margin-right: 8px;
-  width: 16px;
-  height: 16px;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  margin-right: 10px;
+  position: relative;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+}
+
+.filter-option input[type="checkbox"]:checked {
+  background-color: #ff4d4d;
+  border-color: #ff4d4d;
+}
+
+.filter-option input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.filter-option input[type="checkbox"]:hover {
+  border-color: #ff4d4d;
+}
+
+.filter-option span {
+  font-size: 14px;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.filter-option:hover span {
+  color: #ff4d4d;
+}
+
+.filter-section {
+  border-bottom: 1px solid #eee;
+  padding: 15px 0;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 5px 0;
+  font-weight: 500;
+  color: #333;
+}
+
+.filter-header:hover {
+  color: #ff4d4d;
+}
+
+.filter-icon {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.filter-section.active .filter-icon {
+  transform: rotate(180deg);
+}
+
+.filter-options {
+  margin-top: 10px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.filter-section.active .filter-options {
+  max-height: 500px;
+  transition: max-height 0.5s ease-in;
+}
+
+.sidebar-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ff4d4d;
 }
 
 .category-products {
@@ -383,7 +464,6 @@
   margin-bottom: 8px;
   color: #333;
   line-height: 1.4;
-  height: 44px;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;

@@ -107,7 +107,19 @@ export default function Cart() {
                                                 ×
                                             </button>
                                         </div>
-                                        <p className="size-info">Nhóm: {item.type} - {item.material} - {item.color}</p>
+                                        <div className="cart-item-variants">
+
+                                            {item.size && (
+                                                <div className="variant-item">
+                                                    <span className="variant-label">Size:</span>
+                                                    <span className="variant-value">{item.size}</span>
+                                                </div>
+                                            )}
+                                            <div className="variant-item">
+                                                <span className="variant-label">Nhóm:</span>
+                                                <span className="variant-value">{item.color} - {item.material}</span>
+                                            </div>
+                                        </div>
                                         <div className="cart-item-price-info">
                                             <div className="price-info-row">
                                                 <div className="price-column">

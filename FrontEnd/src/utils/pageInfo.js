@@ -38,7 +38,7 @@ export default function getPageInfo(slug) {
 
       case 'tin-tuc-su-kien':
         return {
-            title: 'Tin tức - Sự kiện',
+            title: 'Tin tức - sự kiện',
             breadcrumbLabel: 'Tin tức - sự kiện'
         };
     case 'tin-khuyen-mai':

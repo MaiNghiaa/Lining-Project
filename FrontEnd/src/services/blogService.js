@@ -24,23 +24,26 @@ export const getFeaturedEvents = async (type, limit) => {
 }; 
 
 export const getNewArrival = async () => {
-  const query = `query {
-    Products(
-      filter: {},
-      sort: ["-date_created"],
-      limit: 10
-    ) {
-      id
-      ma_san_pham
-      name
-      price
-      image {
-        filename_disk
-      }
+  const query = `query{
+    collection{
+        id
+        title
+        product_id{
+            id
+            Products_id{
+                id
+                ma_san_pham
+                name
+                price
+                image {
+                    filename_disk
+                }
+            }
+        }
     }
-  }`;
+}`;
   const response = await api.post('/graphql', { query });
-  return response.data.data.Products;
+  return response.data.data.collection;
 }; 
 
 export const getBlogPostById = async (id) => {
@@ -76,41 +79,80 @@ try {
   throw error;
 }
 }
-export const getItemByCollection = async (title, limit) => {
-  try {
-    const limitStr = limit ? `limit: ${limit},` : '';
-    const response = await api.post('/graphql', {
-      query: `
+export const getItemByCollection = async (title) => {
+    const query = `
         query{
-    collection(${limitStr}filter:{
-        title: {
-            _eq:"${title}"
-        }
-    }){
-        id
-        title
-        product_id{
-            id
-            Products_id{
-            id
-            image {
-              filename_disk
+            collection(filter:{
+                title: {
+                    _eq:"${title}"
+                }
+            }){
+                id
+                title
+                product_id{
+                    id
+                    Products_id{
+                        id
+                        image {
+                            filename_disk
+                        }
+                        name
+                        price
+                        ma_san_pham
+                        description
+                        color_id{
+                            color_of_product_id{
+                                id
+                                title
+                            }
+                        }
+                        type_id{
+                            type_of_product_id{
+                                id
+                                collection_name
+                            }
+                        }
+                        line_id{
+                            id
+                            line_of_product_id{
+                                id
+                                title
+                            }
+                        }
+                        size_id{
+                            id
+                            product_size_id{
+                                id
+                                title
+                            }
+                        }
+                        gender_id{
+                            product_gender_id{
+                                id
+                                title
+                            }
+                        }
+                    }
+                }
             }
-            name
-            price
-            ma_san_pham
-            description
-          }
         }
+    `;
+
+    try {
+        const response = await fetch('http://localhost:8055/graphql', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ query })
+        });
+
+        const result = await response.json();
+        return result; // Return the raw response
+    } catch (error) {
+        console.error('Error fetching collection items:', error);
+        throw error;
     }
-}
-      `
-    });
-    return response.data.data.collection[0].product_id;
-  } catch (error) {
-    console.error('Error fetching items by collection:', error);
-    throw error;
-  }
 };
 
 export const getDetailItemById = async (id) => {
@@ -130,6 +172,38 @@ export const getDetailItemById = async (id) => {
         Material
         content
         description
+                        color_id{
+                            color_of_product_id{
+                                id
+                                title
+                            }
+                        }
+                        type_id{
+                            type_of_product_id{
+                                id
+                                collection_name
+                            }
+                        }
+                        line_id{
+                            id
+                            line_of_product_id{
+                                id
+                                title
+                            }
+                        }
+                        size_id{
+                            id
+                            product_size_id{
+                                id
+                                title
+                            }
+                        }
+                        gender_id{
+                            product_gender_id{
+                                id
+                                title
+                            }
+                        }
        
     }
 }`;

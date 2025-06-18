@@ -12,7 +12,10 @@ import BlogDetail from './pages/blog/BlogDetail';
 import ProductDetail from './pages/ProductDetail/ProductDetail';
 import Cart from './pages/Cart/Cart';
 import StoreSystem from './pages/StoreSystem/StoreSystem';
+import Checkout from './pages/Checkout/Checkout';
+import Payment from './pages/Payment/Payment';
 import { CartProvider } from './contexts/CartContext';
+import OrderSuccess from './pages/OrderSuccess/OrderSuccess';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -76,7 +79,10 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/payment" element={<Payment />} />
               <Route path="/he-thong-cua-hang" element={<StoreSystem />} />
+              <Route path="/order-success" element={<OrderSuccess />} />
             </Routes>
           </main>
           <Footer />

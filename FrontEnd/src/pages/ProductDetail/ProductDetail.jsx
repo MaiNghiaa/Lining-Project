@@ -2,14 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import { getDetailItemById, getItemByCollection } from '../../services/blogService';
-import './productDetail.css';
+import './ProductDetail.css';
 import getPageInfo from '../../utils/pageInfo';
 import { useCart } from '../../contexts/CartContext';
+import SizeGuideModal from '../../components/SizeGuideModal/SizeGuideModal';
 
 export default function ProductDetail() {
     const { id, path } = useParams();
     const navigate = useNavigate();
-    const [product, setProduct] = useState(null);
+    const [product, setProduct] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedSize, setSelectedSize] = useState('');
@@ -19,21 +20,21 @@ export default function ProductDetail() {
     const { addToCart } = useCart();
     const isMounted = useRef(true);
     const pageInfor = getPageInfo(path);
-    console.log(pageInfor);
     const breadcrumbItems = product ? [
         { label: pageInfor.title, path: `/collection/${pageInfor.path}` },
         { label: product.name, path: `/collection/${product.name}/${id}` }
     ] : [];
-
+    const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+    const [selectedColor, setSelectedColor] = useState('');
 
     useEffect(() => {
         const fetchProduct = async () => {
             try {
                 const data = await getDetailItemById(id);
-                if (data && data.length > 0) {
-                    setProduct(data[0]);
-                } else {
-                    setError('Không tìm thấy sản phẩm');
+                console.log(data);
+                setProduct(data[0]);
+                if (data.color_id && data.color_id.length > 0) {
+                    setSelectedColor(data.color_id[0].color_of_product_id.title);
                 }
                 setLoading(false);
             } catch (err) {
@@ -42,33 +43,29 @@ export default function ProductDetail() {
             }
         };
         fetchProduct();
-        const relatedProducts = async () => {
+
+        const fetchRelatedProducts = async () => {
             try {
-                console.log(pageInfor.title);
-                const data = await getItemByCollection(pageInfor.title, 8);
-                console.log(data);
-                if (isMounted) {
-                    // Chuyển đổi dữ liệu từ cấu trúc nested sang mảng sản phẩm đơn giản
-                    const processedProducts = data.map(item => ({
-                        id: item.Products_id.id,
-                        name: item.Products_id.name,
-                        price: parseFloat(item.Products_id.price.replace(/,/g, '')),
-                        ma_san_pham: item.Products_id.ma_san_pham,
-                        description: item.Products_id.description,
-                        image: item.Products_id.image
-                    }));
+                const response = await getItemByCollection(pageInfor.title);
+                if (isMounted.current && response?.data?.collection?.[0]?.product_id) {
+                    const processedProducts = response.data.collection[0].product_id
+                        .filter(item => item.Products_id.ma_san_pham !== id) // Loại bỏ sản phẩm hiện tại
+                        .map(item => ({
+                            ...item.Products_id,
+                            name_collection: pageInfor.title,
+                            image: item.Products_id.image || { filename_disk: 'default-product.jpg' }
+                        }));
                     setRelatedProducts(processedProducts);
-                    setLoading(false);
                 }
             } catch (error) {
-                if (isMounted) {
-                    console.error('Error fetching products:', error);
-                    setLoading(false);
+                if (isMounted.current) {
+                    console.error('Error fetching related products:', error);
                 }
             }
         };
-        relatedProducts();
-    }, [id]);
+
+        fetchRelatedProducts();
+    }, [id, pageInfor.title]);
 
     // Giả lập giá gốc và tính tiết kiệm nếu chưa có trường giá gốc
     const originalPrice = product?.original_price || (product?.price ? Math.round(product.price * 1.43) : 0);
@@ -80,23 +77,33 @@ export default function ProductDetail() {
         setQuantity(newQuantity);
     };
 
+    const handleColorSelect = (colorTitle) => {
+        setSelectedColor(colorTitle);
+    };
+
     const handleAddToCart = () => {
-        // if (!selectedSize) {
-        //     alert('Vui lòng chọn kích thước');
-        //     return;
-        // }
+        if (!selectedSize) {
+            alert('Vui lòng chọn kích thước');
+            return;
+        }
+
+        if (!selectedColor) {
+            alert('Vui lòng chọn màu sắc');
+            return;
+        }
 
         const cartItem = {
-            id: product.ma_san_pham,
+            id: `${product.ma_san_pham}_${selectedColor}_${selectedSize}`,
+            productId: product.ma_san_pham,
             name: product.name,
             price: product.price,
             size: selectedSize,
             quantity: quantity,
-            type: "oke",
-            material: "ổn đi hả",
-            color: "đỏ",
+            color: selectedColor,
             image: product.image.filename_disk,
-            ma_san_pham: product.ma_san_pham
+            ma_san_pham: product.ma_san_pham,
+            type: product.type || 'Vợt Pick',
+            material: product.Material || 'Carbon Fiber'
         };
 
         addToCart(cartItem);
@@ -115,6 +122,9 @@ export default function ProductDetail() {
         // Chuyển hướng đến trang thanh toán
         navigate('/checkout');
     };
+
+    const openSizeGuide = () => setIsSizeGuideOpen(true);
+    const closeSizeGuide = () => setIsSizeGuideOpen(false);
 
     if (loading) {
         return <div className="loading">Đang tải...</div>;
@@ -136,7 +146,7 @@ export default function ProductDetail() {
                     <div className="product-detail-col">
                         <div className="main-image">
                             <img
-                                src={`http://localhost:8055/assets/${product.image.filename_disk}`}
+                                src={`http://localhost:8055/assets/${product.image?.filename_disk}`}
                                 alt={product.name}
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
@@ -151,40 +161,27 @@ export default function ProductDetail() {
                                 <span>Mã SP: {product.ma_san_pham || id}</span>
                             </div>
                             <div className="product-pricing">
-                                <span className="product-price">{product.price.toLocaleString('vi-VN')}₫</span>
+                                <span className="product-price">{product.price}₫</span>
                             </div>
                             <div className="product-attributes">
-                                <div className="attribute-row">
-                                    <span className="attribute-label">Vật liệu</span>
-                                    <span className="attribute-value bordered">{product.Material || 'Carbon Fiber'}</span>
+                                <div className="product-colors">
+                                    <h3>Màu sắc</h3>
+                                    <div className="color-options">
+                                        {product.color_id?.map((color) => (
+                                            <div
+                                                key={color.color_of_product_id.id}
+                                                className={`color-option ${selectedColor === color.color_of_product_id.title ? 'selected' : ''}`}
+                                                onClick={() => setSelectedColor(color.color_of_product_id.title)}
+                                                style={{ backgroundColor: color.color_of_product_id.title.toLowerCase() }}
+                                            />
+                                        ))}
+                                    </div>
                                 </div>
-                                <div className="attribute-row">
-                                    <span className="attribute-label">Màu sắc</span>
-                                    <span className="attribute-value bordered color-box">
-                                        {product.color_id && product.color_id.length > 0 ? (
-                                            product.color_id.map((color, idx) => (
-                                                <span key={color.color_of_product_id.id || idx} style={{ display: 'inline-flex', alignItems: 'center', marginRight: 8 }}>
-                                                    <span
-                                                        className="color-dot"
-                                                        style={{ background: color.color_of_product_id.hex_color || '#111' }}
-                                                    ></span>
-                                                    <span style={{ fontSize: 14 }}>{color.color_of_product_id.title}</span>
-                                                </span>
-                                            ))
-                                        ) : (
-                                            <>
-                                                <span className="color-dot" style={{ background: '#111' }}></span>
-                                                Black
-                                            </>
-                                        )}
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="product-actions-row">
-                                <div className="quantity-selector">
-                                    <span className="attribute-label">Số lượng</span>
+                                <div className="product-quantity">
+                                    <h3>Số lượng</h3>
                                     <div className="quantity-controls">
                                         <button
+                                            className="quantity-btn"
                                             onClick={() => handleQuantityChange(quantity - 1)}
                                             disabled={quantity <= 1}
                                         >
@@ -196,8 +193,10 @@ export default function ProductDetail() {
                                             onChange={(e) => handleQuantityChange(parseInt(e.target.value))}
                                             min="1"
                                             max="10"
+                                            className="quantity-input"
                                         />
                                         <button
+                                            className="quantity-btn"
                                             onClick={() => handleQuantityChange(quantity + 1)}
                                             disabled={quantity >= 10}
                                         >
@@ -205,7 +204,25 @@ export default function ProductDetail() {
                                         </button>
                                     </div>
                                 </div>
-                                <button className="size-guide-btn">Hướng dẫn chọn size</button>
+                                <div className="product-sizes">
+                                    <div className="size-header">
+                                        <h3>Kích thước</h3>
+                                        <button className="size-guide-btn" onClick={openSizeGuide}>
+                                            Hướng dẫn chọn size
+                                        </button>
+                                    </div>
+                                    <div className="size-options">
+                                        {product.size_id?.map((size) => (
+                                            <div
+                                                key={size.product_size_id.id}
+                                                className={`size-option ${selectedSize === size.product_size_id.title ? 'selected' : ''}`}
+                                                onClick={() => setSelectedSize(size.product_size_id.title)}
+                                            >
+                                                {size.product_size_id.title}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
                             <div className="action-buttons">
                                 <button className="add-to-cart" onClick={handleAddToCart}>
@@ -318,21 +335,33 @@ export default function ProductDetail() {
                     <h2 className="product-related-title">Sản phẩm liên quan</h2>
                     <div className="product-related-list">
                         {relatedProducts.map((product) => (
-                            <div className="product-related-item" key={product.ma_san_pham} onClick={() => navigate(`/collection/${pageInfor.breadcrumbLabel}/${product.ma_san_pham}`)}>
+                            <div
+                                className="product-related-item"
+                                key={product.ma_san_pham}
+                                onClick={() => navigate(`/collection/${convertToPath(product.name_collection)}/${product.ma_san_pham}`)}
+                            >
                                 <img
-                                    src={`http://localhost:8055/assets/${product.image.filename_disk}`}
-                                    alt={product.name}
+                                    src={`http://localhost:8055/assets/${product.image?.filename_disk}`}
+                                    alt={product.name || 'Product image'}
                                     className="product-related-img"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = 'https://theme.hstatic.net/1000312752/1001368650/14/default-product.jpg?v=68';
+                                    }}
                                 />
                                 <div className="product-related-name">{product.name}</div>
                                 <div className="product-related-price">
-                                    {product.price?.toLocaleString('vi-VN')}₫
+                                    {product.price}₫
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
             </div>
+            <SizeGuideModal
+                isOpen={isSizeGuideOpen}
+                onClose={closeSizeGuide}
+            />
         </div>
     );
-} 
+}

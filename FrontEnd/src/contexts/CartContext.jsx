@@ -21,12 +21,17 @@ export const CartProvider = ({ children }) => {
     const addToCart = (item) => {
         const currentCart = JSON.parse(localStorage.getItem('cart')) || [];
         const existingItemIndex = currentCart.findIndex(
-            cartItem => cartItem.id === item.id && cartItem.size === item.size
+            cartItem =>
+                cartItem.ma_san_pham === item.ma_san_pham &&
+                cartItem.color === item.color &&
+                cartItem.size === item.size
         );
 
         if (existingItemIndex !== -1) {
+            // Nếu tìm thấy sản phẩm trùng lặp, cập nhật số lượng
             currentCart[existingItemIndex].quantity += item.quantity;
         } else {
+            // Nếu không tìm thấy, thêm mới vào giỏ hàng
             currentCart.push(item);
         }
 

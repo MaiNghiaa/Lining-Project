@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8055/graphql';
+const API_URL =  'http://localhost:5000';
 
 export const subscribeNewsletter = async (email) => {
     try {
@@ -28,4 +28,5 @@ export const subscribeNewsletter = async (email) => {
             error: error.message || 'Có lỗi xảy ra khi đăng ký'
         };
     }
-}; 
+};
+

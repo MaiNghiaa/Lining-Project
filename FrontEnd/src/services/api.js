@@ -1,15 +1,27 @@
 import axios from 'axios';
-
-const DEFAULT_TOKEN = 'YQuK4ANYoyf1Zv-BIjf0SDJuzYieV_Cc';
+const DEFAULT_TOKEN = '3Skd9EznWm4w2Gt0P5uOt99IMDUTI6Oq';
 
 const api = axios.create({
   baseURL: 'http://localhost:8055/',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${DEFAULT_TOKEN}`,
   },
 });
+
+
+// Add request interceptor to add auth token
+api.interceptors.request.use(
+  (config) => {
+    if (DEFAULT_TOKEN) {
+      config.headers.Authorization = `Bearer ${DEFAULT_TOKEN}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 const get = (url, config = {}) => api.get(url, config);
 const post = (url, data, config = {}) => api.post(url, data, config);

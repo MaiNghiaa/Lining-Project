@@ -14,7 +14,7 @@ const Blog = () => {
     const breadcrumbItems = [
         { label: pageInfo.breadcrumbLabel, path: `/blogs/${slug}` }
     ];
-
+    console.log(pageInfo);
     useEffect(() => {
         getFeaturedEvents(`${pageInfo.title}`).then(data => {
             setBlogPosts(data);

@@ -4,50 +4,14 @@ import "./collection.css"; // import file css thường
 import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
 import { getItemByCollection } from "../../services/blogService";
 import getPageInfo from "../../utils/pageInfo";
-
-const filterOptions = {
-  "Loại Sản Phẩm": [
-    "Giày",
-    "Quần áo",
-    "Phụ kiện",
-    "Balo & Túi xách",
-    "Mũ nón"
-  ],
-  "Kích cỡ": [
-    "35", "36", "37", "38", "39", "40", "41", "42", "43", "44"
-  ],
-  "Màu sắc": [
-    "Đen",
-    "Trắng",
-    "Đỏ",
-    "Xanh dương",
-    "Xanh lá",
-    "Vàng",
-    "Hồng",
-    "Cam"
-  ],
-  "Dòng Sản Phẩm": [
-    "Running",
-    "Bóng đá",
-    "Bóng rổ",
-    "Tennis",
-    "Cầu lông",
-    "Gym & Training"
-  ],
-  "Giới Tính": [
-    "Nam",
-    "Nữ",
-    "Unisex"
-  ]
-};
-
-
+import { collectionFilters } from "../../utils/filterCollection";
 export default function Collection() {
   const [sort, setSort] = useState("featured");
   const [expandedFilters, setExpandedFilters] = useState({});
   const [selectedFilters, setSelectedFilters] = useState({});
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
   const { path } = useParams();
@@ -86,22 +50,32 @@ export default function Collection() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        console.log(pageInfo.title);
-        const data = await getItemByCollection(pageInfo.title);
-        console.log(data);
-        if (isMounted.current) {
-          // Chuyển đổi dữ liệu từ cấu trúc nested sang mảng sản phẩm đơn giản
-          const processedProducts = data.map(item => ({
-            id: item.Products_id.id,
-            name: item.Products_id.name,
-            price: parseFloat(item.Products_id.price.replace(/,/g, '')),
-            ma_san_pham: item.Products_id.ma_san_pham,
-            description: item.Products_id.description,
-            image: item.Products_id.image
-          }));
+        const response = await getItemByCollection(pageInfo.title);
+        console.log("@@response", response);
+        if (response?.data?.collection?.[0]?.product_id) {
+          const processedProducts = response.data.collection[0].product_id.map(item => {
+            const product = item.Products_id;
+            return {
+              id: product.id,
+              name: product.name,
+              price: parseFloat(product.price.replace(/,/g, '')),
+              ma_san_pham: product.ma_san_pham,
+              description: product.description,
+              image: product.image,
+              type: product.type_id?.[0]?.type_of_product_id?.collection_name || '',
+              line: product.line_id?.[0]?.line_of_product_id?.title || '',
+              size: product.size_id?.map(s => s.product_size_id?.title).filter(Boolean) || [],
+              gender: product.gender_id?.map(g => g.product_gender_id?.title).filter(Boolean) || [],
+              color: product.color_id?.map(c => c.color_of_product_id?.title).filter(Boolean) || []
+            };
+          });
+          console.log("Processed products:", processedProducts);
           setProducts(processedProducts);
-          setLoading(false);
+          setFilteredProducts(processedProducts);
+        } else {
+          console.log("No products found in response:", response);
         }
+        setLoading(false);
       } catch (error) {
         if (isMounted.current) {
           console.error('Error fetching products:', error);
@@ -117,6 +91,40 @@ export default function Collection() {
       isMounted.current = false;
     };
   }, [pageInfo.title]);
+
+  useEffect(() => {
+    const applyFilters = () => {
+      let filtered = [...products];
+
+      Object.entries(selectedFilters).forEach(([filterType, selectedValues]) => {
+        if (selectedValues.length > 0) {
+          filtered = filtered.filter(product => {
+            switch (filterType) {
+              case 'Loại Sản Phẩm':
+                return selectedValues.includes(product.type);
+              case 'Dòng Sản Phẩm':
+                return selectedValues.includes(product.line);
+              case 'Kích cỡ':
+                return product.size.length === 0 || product.size.some(size => selectedValues.includes(size));
+              case 'Màu sắc':
+                return product.color.length === 0 || product.color.some(color => selectedValues.includes(color));
+              case 'Giới Tính':
+                return product.gender.length === 0 || product.gender.some(gender => selectedValues.includes(gender));
+              default:
+                return true;
+            }
+          });
+        }
+      });
+
+      setFilteredProducts(filtered);
+    };
+
+    applyFilters();
+  }, [selectedFilters, products]);
+
+  console.log('Loading state:', loading);
+  console.log('Products:', products);
 
   const sortProducts = (products) => {
     if (!Array.isArray(products)) return [];
@@ -141,10 +149,15 @@ export default function Collection() {
     }
   };
 
-  const sortedProducts = sortProducts(products);
+  const sortedProducts = sortProducts(filteredProducts);
 
   const handleProductClick = (productId) => {
     navigate(`/collection/${path}/${productId}`);
+  };
+
+  // Get the appropriate filters based on the collection
+  const getFiltersForCollection = () => {
+    return collectionFilters[pageInfo.title] || collectionFilters.default;
   };
 
   if (loading) {
@@ -160,7 +173,7 @@ export default function Collection() {
           {/* Sidebar Filter */}
           <div className="category-sidebar">
             <h2 className="sidebar-title">BỘ LỌC</h2>
-            {Object.entries(filterOptions).map(([filterName, options]) => (
+            {Object.entries(getFiltersForCollection()).map(([filterName, options]) => (
               <div
                 key={filterName}
                 className={`filter-section ${expandedFilters[filterName] ? 'active' : ''}`}

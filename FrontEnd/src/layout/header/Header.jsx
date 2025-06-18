@@ -5,6 +5,7 @@ import { useCart } from '../../contexts/CartContext'
 
 const Header = ({ onSearchClick }) => {
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [dropdownTimer, setDropdownTimer] = useState(null);
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState('');
@@ -31,16 +32,18 @@ const Header = ({ onSearchClick }) => {
     navigate('/login');
   };
 
-  const handleMouseEnter = (index) => {
-    if (window.innerWidth > 768) {
-      setActiveDropdown(index);
+  const handleMouseEnter = (dropdown) => {
+    if (dropdownTimer) {
+      clearTimeout(dropdownTimer);
     }
+    setActiveDropdown(dropdown);
   };
 
   const handleMouseLeave = () => {
-    if (window.innerWidth > 768) {
+    const timer = setTimeout(() => {
       setActiveDropdown(null);
-    }
+    }, 300); // 300ms delay
+    setDropdownTimer(timer);
   };
 
   const handleDropdownClick = (index) => {
@@ -151,19 +154,68 @@ const Header = ({ onSearchClick }) => {
             >
               <img src="https://theme.hstatic.net/1000312752/1001368650/14/icon-user.png?v=68" alt="user" className="action-img" />
               {activeDropdown === 'user' && (
-                <div className="user-dropdown-menu" style={{ position: 'absolute', top: '100%', right: 0, background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', zIndex: 10, minWidth: 180 }}>
-                  <ul className="user-dropdown-list">
+                <div className="user-dropdown-menu" style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  background: '#fff',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  zIndex: 10,
+                  minWidth: 220,
+                  borderRadius: '8px',
+                  padding: '8px 0',
+                  marginTop: '8px',
+                  border: '1px solid #eee'
+                }}>
+                  <ul className="user-dropdown-list" style={{
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: 0
+                  }}>
                     {isLoggedIn ? (
                       <>
-                        <li className="nav-item-userinfo" style={{ cursor: 'default', color: '#888' }}>
+                        <li className="nav-item-userinfo" style={{
+                          padding: '12px 16px',
+                          borderBottom: '1px solid #eee',
+                          color: '#666',
+                          fontSize: '14px',
+                          fontWeight: 500
+                        }}>
                           {userEmail}
                         </li>
-                        <li className="nav-item-logout" onClick={handleLogout}>Đăng xuất</li>
+                        <li className="nav-item-logout" onClick={handleLogout} style={{
+                          padding: '12px 16px',
+                          cursor: 'pointer',
+                          color: '#e74c3c',
+                          fontSize: '14px',
+                          transition: 'background-color 0.2s',
+                          ':hover': {
+                            backgroundColor: '#f8f9fa'
+                          }
+                        }}>Đăng xuất</li>
                       </>
                     ) : (
                       <>
-                        <li className="nav-item-login" onClick={() => { setActiveDropdown(null); navigate('/login'); }}>Đăng nhập</li>
-                        <li className="nav-item-register" onClick={() => { setActiveDropdown(null); navigate('/register'); }}>Đăng ký</li>
+                        <li className="nav-item-login" onClick={() => { setActiveDropdown(null); navigate('/login'); }} style={{
+                          padding: '12px 16px',
+                          cursor: 'pointer',
+                          color: '#333',
+                          fontSize: '14px',
+                          transition: 'background-color 0.2s',
+                          ':hover': {
+                            backgroundColor: '#f8f9fa'
+                          }
+                        }}>Đăng nhập</li>
+                        <li className="nav-item-register" onClick={() => { setActiveDropdown(null); navigate('/register'); }} style={{
+                          padding: '12px 16px',
+                          cursor: 'pointer',
+                          color: '#333',
+                          fontSize: '14px',
+                          transition: 'background-color 0.2s',
+                          ':hover': {
+                            backgroundColor: '#f8f9fa'
+                          }
+                        }}>Đăng ký</li>
                       </>
                     )}
                   </ul>
@@ -195,19 +247,68 @@ const Header = ({ onSearchClick }) => {
           >
             <img src="https://theme.hstatic.net/1000312752/1001368650/14/icon-user.png?v=68" alt="user" className="action-img" />
             {activeDropdown === 'user' && (
-              <div className="user-dropdown-menu" style={{ position: 'absolute', top: '100%', right: 0, background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', zIndex: 10, minWidth: 180 }}>
-                <ul className="user-dropdown-list">
+              <div className="user-dropdown-menu" style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                background: '#fff',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                zIndex: 10,
+                minWidth: 220,
+                borderRadius: '8px',
+                padding: '8px 0',
+                marginTop: '8px',
+                border: '1px solid #eee'
+              }}>
+                <ul className="user-dropdown-list" style={{
+                  listStyle: 'none',
+                  padding: 0,
+                  margin: 0
+                }}>
                   {isLoggedIn ? (
                     <>
-                      <li className="nav-item-userinfo" style={{ cursor: 'default', color: '#888' }}>
+                      <li className="nav-item-userinfo" style={{
+                        padding: '12px 16px',
+                        borderBottom: '1px solid #eee',
+                        color: '#666',
+                        fontSize: '14px',
+                        fontWeight: 500
+                      }}>
                         {userEmail}
                       </li>
-                      <li className="nav-item-logout" onClick={handleLogout}>Đăng xuất</li>
+                      <li className="nav-item-logout" onClick={handleLogout} style={{
+                        padding: '12px 16px',
+                        cursor: 'pointer',
+                        color: '#e74c3c',
+                        fontSize: '14px',
+                        transition: 'background-color 0.2s',
+                        ':hover': {
+                          backgroundColor: '#f8f9fa'
+                        }
+                      }}>Đăng xuất</li>
                     </>
                   ) : (
                     <>
-                      <li className="nav-item-login" onClick={() => { setActiveDropdown(null); navigate('/login'); }}>Đăng nhập</li>
-                      <li className="nav-item-register" onClick={() => { setActiveDropdown(null); navigate('/register'); }}>Đăng ký</li>
+                      <li className="nav-item-login" onClick={() => { setActiveDropdown(null); navigate('/login'); }} style={{
+                        padding: '12px 16px',
+                        cursor: 'pointer',
+                        color: '#333',
+                        fontSize: '14px',
+                        transition: 'background-color 0.2s',
+                        ':hover': {
+                          backgroundColor: '#f8f9fa'
+                        }
+                      }}>Đăng nhập</li>
+                      <li className="nav-item-register" onClick={() => { setActiveDropdown(null); navigate('/register'); }} style={{
+                        padding: '12px 16px',
+                        cursor: 'pointer',
+                        color: '#333',
+                        fontSize: '14px',
+                        transition: 'background-color 0.2s',
+                        ':hover': {
+                          backgroundColor: '#f8f9fa'
+                        }
+                      }}>Đăng ký</li>
                     </>
                   )}
                 </ul>

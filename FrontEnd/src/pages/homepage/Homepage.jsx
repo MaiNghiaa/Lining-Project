@@ -1,7 +1,26 @@
 import React, { useState, useEffect } from "react";
 import "./homepage.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getFeaturedEvents, getNewArrival } from '../../services/blogService';
+import getPageInfo from "../../utils/pageInfo";
+
+const convertToPath = (name) => {
+  const pathMap = {
+    'Bóng rổ': 'bong-ro',
+    'Bóng đá': 'bong-da',
+    'Cầu lông': 'cau-long',
+    'Golf': 'golf',
+    'Wade': 'wade',
+    'Badfive': 'badfive',
+    'Lifestyle': 'lifestyle',
+    'Issac': 'issac',
+    'Pickleball': 'pickleball',
+    'Chạy bộ': 'chay-bo',
+    'Tập luyện': 'tap-luyen'
+  };
+
+  return pathMap[name];
+};
 
 export default function Homepage() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -24,6 +43,8 @@ export default function Homepage() {
       image: 'http://theme.hstatic.net/1000312752/1001368650/14/slideshow_4.jpg?v=68',
     },
   ];
+
+  const navigate = useNavigate();
 
   const handlePrevSlide = () => {
     setCurrentSlide((prev) => (prev > 0 ? prev - 1 : slides.length - 1));
@@ -102,7 +123,6 @@ export default function Homepage() {
     },
   ];
 
-
   const handlePrevGroup = () => {
     setCurrentGroupIndex((prev) =>
       prev > 0 ? prev - 1 : Math.ceil(itemsNav.length / itemsPerGroup) - 1
@@ -119,6 +139,40 @@ export default function Homepage() {
     const start = currentGroupIndex * itemsPerGroup;
     return itemsNav.slice(start, start + itemsPerGroup);
   };
+
+  const handleProductClick = (item) => {
+    if (!item) return;
+    console.log(item);
+
+    navigate(`/collection/${convertToPath(item.name_collection)}/${item.ma_san_pham}`);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const collections = await getNewArrival();
+        // Lấy tất cả sản phẩm từ tất cả collection và thêm tên collection
+        const allProducts = collections.reduce((acc, collection) => {
+          const products = collection.product_id.map(item => ({
+            ...item.Products_id,
+            name_collection: collection.title
+          }));
+          return [...acc, ...products];
+        }, []);
+
+        // Sắp xếp theo id (giả sử id càng lớn thì càng mới) và lấy 10 sản phẩm đầu tiên
+        const sortedProducts = allProducts
+          .sort((a, b) => b.id - a.id)
+          .slice(0, 10);
+
+        setNewArrival(sortedProducts);
+      } catch (error) {
+        console.error('Error fetching new arrivals:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -206,67 +260,69 @@ export default function Homepage() {
             </div>
             <div className="readytowear__wrapper">
               <div className="readytowear-list">
-                <div className="readytowear-items pd-item">
-                  <div
-                    className="readytowear-img"
-                    style={{ width: 255, height: 255 }}
-                  >
-                    <img
-                      src="https://product.hstatic.net/1000312752/product/cdf10ca566464ae3a32fea53a1633bb5c9e14993783480a92007f3b38624078f777ed3_3a339d23d91c44e08fbbc9007cbd7a1d.jpg"
-                      alt
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  </div>
-                  <div className="readytowear-desc">
-                    <h3 style={{ margin: "10px 0px" }}>
-                      Áo T-Shirt nữ ATST792-3V
-                    </h3>
-                    <p
-                      style={{
-                        paddingBottom: 10,
-                        color: "#c54934",
-                        fontWeight: 600,
-                      }}
-                    >
-                      608,727₫
-                    </p>
-                  </div>
-                </div>
+
                 {newArrival.map((item, index) => {
-                  return <div className="readytowear-items pd-item" key={item.ma_san_pham}>
+                  return (
                     <div
-                      className="readytowear-img"
-                      style={{ width: 255, height: 255 }}
+                      className="readytowear-items pd-item"
+                      key={index}
+                      onClick={() => handleProductClick(item)}
+                      style={{
+                        cursor: 'pointer',
+                        transition: 'transform 0.2s ease-in-out',
+                        ':hover': {
+                          transform: 'translateY(-5px)'
+                        }
+                      }}
                     >
-                      <img
-                        src={`http://localhost:8055/assets/${item.image.filename_disk}`}
-                        alt
+                      <div
+                        className="readytowear-img"
                         style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </div>
-                    <div className="readytowear-desc">
-                      <h3 style={{ margin: "10px 0px" }}>
-                        {item.name}
-                      </h3>
-                      <p
-                        style={{
-                          paddingBottom: 10,
-                          color: "#c54934",
-                          fontWeight: 600,
+                          width: 255,
+                          height: 255,
+                          overflow: 'hidden'
                         }}
                       >
-                        {item.price}₫
-                      </p>
+                        <img
+                          src={`http://localhost:8055/assets/${item.image?.filename_disk || 'default-product.jpg'}`}
+                          alt={item.name || 'Product image'}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            transition: 'transform 0.3s ease-in-out',
+                            ':hover': {
+                              transform: 'scale(1.05)'
+                            }
+                          }}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = 'https://theme.hstatic.net/1000312752/1001368650/14/default-product.jpg?v=68';
+                          }}
+                        />
+                      </div>
+                      <div className="readytowear-desc">
+                        <h3 style={{
+                          margin: "10px 0px",
+                          fontSize: '16px',
+                          fontWeight: 500,
+                          color: '#333'
+                        }}>
+                          {item.name}
+                        </h3>
+                        <p
+                          style={{
+                            paddingBottom: 10,
+                            color: "#c54934",
+                            fontWeight: 600,
+                            fontSize: '15px'
+                          }}
+                        >
+                          {parseInt(item.price?.replace(/,/g, '')).toLocaleString('vi-VN')}₫
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  );
                 })}
               </div>
               <div
@@ -276,8 +332,9 @@ export default function Homepage() {
                   justifyContent: "center",
                   alignItems: "center",
                 }}
+
               >
-                <button className="btn1">Xem thêm</button>
+                <button className="btn1" onClick={() => navigate('/collection/pickleball')}>Xem thêm</button>
               </div>
             </div>
           </div>
