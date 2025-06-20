@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8055/flows/trigger/1a082821-e92a-42cf-b53a-8132450f641b';
+const STOCK_API_URL = 'http://localhost:8055/items/stock_products';
 
 export const createOrder = async (orderData) => {
     try {
@@ -33,4 +34,27 @@ export const createOrder = async (orderData) => {
         console.error('Error creating order:', error);
         throw error;
     }
-}; 
+};
+
+export const updateStock = async (orderResponse) => {
+    try {
+        if (!orderResponse || !orderResponse.ids || !orderResponse.data) {
+            console.log('No stock data to update or data is in wrong format.');
+            return;
+        }
+
+        // Transform the data to match the Directus API format for batch updates
+        const dataToUpdate = orderResponse.ids.map((id, index) => ({
+            id: id,
+            stock: orderResponse.data[index].stock
+        }));
+
+        // Make the PATCH request to the standard Directus items endpoint
+        const response = await axios.patch(STOCK_API_URL, dataToUpdate);
+        console.log('Stock update response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating stock:', error);
+        throw error;
+    }
+};

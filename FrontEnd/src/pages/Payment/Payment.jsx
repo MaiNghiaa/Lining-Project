@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import './Payment.css';
-import { createOrder } from '../../services/orderService';
+import { createOrder, updateStock } from '../../services/orderService';
 import { sendOrderConfirmationEmail } from '../../services/emailService';
+import { getAllStock } from '../../services/blogService';
 
 export default function Payment() {
     const navigate = useNavigate();
@@ -15,9 +16,9 @@ export default function Payment() {
 
     useEffect(() => {
         // Load cart data from localStorage
-        const savedCart = JSON.parse(localStorage.getItem('cart')) || [];
+        const orderData = JSON.parse(localStorage.getItem('orderData')) || { items: [] };
+        const savedCart = orderData.items || [];
         setCartItems(savedCart);
-
         // Calculate total
         const sum = savedCart.reduce((acc, item) => {
             const price = typeof item.price === 'string'
@@ -65,20 +66,33 @@ export default function Payment() {
                 }))
             };
 
-            // Create order
-            const response = await createOrder(orderData);
-            console.log('Order created:', response);
+            // Create order and get the calculated stock updates
+            const orderResponse = await createOrder(orderData);
+            console.log('Order creation flow response:', orderResponse);
 
-            // Add order number to orderData
-            orderData.orderNumber = response.data.id;
+            // Update stock in the database
+            if (orderResponse) {
+                try {
+                    await updateStock(orderResponse);
+                    console.log('Stock updated successfully.');
+                } catch (stockError) {
+                    console.error('Could not update stock:', stockError);
+                    // Decide if you want to proceed even if stock update fails
+                }
+            }
+
+            // Prepare for email confirmation
+            const orderDetailsForEmail = {
+                ...orderData,
+                orderNumber: 'N/A' // The flow response doesn't contain the order ID
+            };
 
             // Send confirmation email
             try {
-                await sendOrderConfirmationEmail(orderData);
+                await sendOrderConfirmationEmail(orderDetailsForEmail);
                 console.log('Confirmation email sent successfully');
             } catch (emailError) {
                 console.error('Error sending confirmation email:', emailError);
-                // Continue with order process even if email fails
             }
 
             // Clear cart and user data after successful order

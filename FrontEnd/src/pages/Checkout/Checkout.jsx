@@ -74,6 +74,15 @@ export default function Checkout() {
         { label: 'Thông tin giao hàng', path: '/checkout' }
     ];
 
+    const handleColorSelect = (colorTitle) => {
+        setSelectedColor(colorTitle);
+        // Nếu màu này hết hàng, reset số lượng về 1
+        const colorStock = stockData?.find(item => item.color_id?.title === colorTitle);
+        if (!colorStock || parseInt(colorStock.stock) === 0) {
+            setQuantity(1);
+        }
+    };
+
     return (
         <div className="checkout-page">
 
@@ -222,7 +231,7 @@ export default function Checkout() {
                                                 : item.price}₫
                                         </div>
                                         <div className="cart-item-quantity">
-                                            Số lượng: {item.quantity}
+                                            <span className="quantity-display">{item.quantity}</span>
                                         </div>
                                     </div>
                                 </div>

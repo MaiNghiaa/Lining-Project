@@ -1,7 +1,7 @@
-import api from './api';
+import api from "./api";
 
 export const getFeaturedEvents = async (type, limit) => {
-  const limitStr = limit ? `limit: ${limit},` : '';
+  const limitStr = limit ? `limit: ${limit},` : "";
   const query = `query{
     Blog(${limitStr}filter:{
         type_id:{
@@ -10,18 +10,22 @@ export const getFeaturedEvents = async (type, limit) => {
             }
         }
     }){
-         id
+        id
         meta_data
         image_cover{
             filename_disk
         }
+        type_id{
+            title
+            link_title
+        }   
         title
         description
     }
   }`;
-  const response = await api.post('/graphql', { query });
+  const response = await api.post("/graphql", { query });
   return response.data.data.Blog;
-}; 
+};
 
 export const getNewArrival = async () => {
   const query = `query{
@@ -42,9 +46,9 @@ export const getNewArrival = async () => {
         }
     }
 }`;
-  const response = await api.post('/graphql', { query });
+  const response = await api.post("/graphql", { query });
   return response.data.data.collection;
-}; 
+};
 
 export const getBlogPostById = async (id) => {
   const query = `query{
@@ -71,16 +75,16 @@ export const getBlogPostById = async (id) => {
         date_updated
     }
 }`;
-try {
-  const response = await api.post('/graphql', { query });
-  return response.data.data.Blog[0];
-} catch (error) {
-  console.error('Error fetching blog post:', error);
-  throw error;
-}
-}
+  try {
+    const response = await api.post("/graphql", { query });
+    return response.data.data.Blog[0];
+  } catch (error) {
+    console.error("Error fetching blog post:", error);
+    throw error;
+  }
+};
 export const getItemByCollection = async (title) => {
-    const query = `
+  const query = `
         query{
             collection(filter:{
                 title: {
@@ -138,21 +142,21 @@ export const getItemByCollection = async (title) => {
         }
     `;
 
-    try {
-        const response = await fetch('http://localhost:8055/graphql', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ query })
-        });
+  try {
+    const response = await fetch("http://localhost:8055/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ query }),
+    });
 
-        const result = await response.json();
-        return result; // Return the raw response
-    } catch (error) {
-        console.error('Error fetching collection items:', error);
-        throw error;
-    }
+    const result = await response.json();
+    return result; // Return the raw response
+  } catch (error) {
+    console.error("Error fetching collection items:", error);
+    throw error;
+  }
 };
 
 export const getDetailItemById = async (id) => {
@@ -207,20 +211,124 @@ export const getDetailItemById = async (id) => {
        
     }
 }`;
- // color_id{
-        //       id
-        //    color_of_product_id{
-        //     id
-        //      hex_color
-        //     title
-        //    }
-        // }
-try {
-  const response = await api.post('/graphql', { query });
-  return response.data.data.Products;
-} catch (error) {
-  console.error('Error fetching detail item by id:', error);
-  throw error;
-}
+  // color_id{
+  //       id
+  //    color_of_product_id{
+  //     id
+  //      hex_color
+  //     title
+  //    }
+  // }
+  try {
+    const response = await api.post("/graphql", { query });
+    return response.data.data.Products;
+  } catch (error) {
+    console.error("Error fetching detail item by id:", error);
+    throw error;
+  }
 };
 
+export const getBannerBlog = async () => {
+  const query = `query{
+    Blog{
+      id
+      meta_data
+      image_cover{
+        filename_disk
+      }
+      type_id{
+        title
+        link_title
+      }
+    }
+  }`;
+  const response = await api.post("/graphql", { query });
+  return response.data.data.Blog;
+};
+
+export const getMoreImage = async (id) => {
+  const query = `query{
+    product_image(filter:{
+        product_id:{
+            ma_san_pham:{
+                    _eq:"${id}"
+            }
+        }
+    }){
+        id
+        images{
+            directus_files_id{
+                filename_disk
+            }
+        }
+    }
+}
+`;
+  const response = await api.post("/graphql", { query });
+  return response.data.data.product_image;
+};
+
+export const getStockById = async (id) => {
+  const query = `query{
+    stock_products(filter:{
+    product_id:{
+        ma_san_pham:{
+            _eq: "${id}"
+        }
+    }
+    }   ){
+        id
+        product_id{
+            id
+            ma_san_pham
+            
+        }
+        color_id{
+        title
+            hex_color
+        }
+        stock
+        size_id{
+            id
+            title
+        }
+    }
+}`;
+  try {
+    const response = await api.post("/graphql", { query });
+    return response.data.data.stock_products;
+  } catch (error) {
+    console.error("Error fetching stock by id:", error);
+    throw error;
+  }
+};
+
+export const getAllStock = async () => {
+  const query =
+  `
+  query{
+    stock_products{
+        id
+        product_id{
+            id
+        }
+        color_id{
+            title
+            hex_color
+        }
+        stock
+        size_id{
+            id
+            title
+        }
+    }
+}
+  `;
+  try {
+    const response = await api.post("/graphql", { query });
+    return response.data.data.stock_products;
+  } catch (error) {
+    console.error("Error fetching stock by id:", error);
+    throw error;
+  }
+};

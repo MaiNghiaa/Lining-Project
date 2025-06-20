@@ -225,25 +225,31 @@ export default function Collection() {
             </div>
 
             <div className="products-grid">
-              {sortedProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="product-card"
-                  onClick={() => handleProductClick(product.ma_san_pham)}
-                >
-                  <div className="product-image">
-                    <img
-                      src={`http://localhost:8055/assets/${product.image.filename_disk}`}
-                      alt={product.name}
-                    />
+              {sortedProducts.length > 0 ? (
+                sortedProducts.map((product) => (
+                  <div
+                    key={product.id}
+                    className="product-card"
+                    onClick={() => handleProductClick(product.ma_san_pham)}
+                  >
+                    <div className="product-image">
+                      <img
+                        src={`http://localhost:8055/assets/${product.image.filename_disk}`}
+                        alt={product.name}
+                      />
+                    </div>
+                    <div className="product-info">
+                      <h3 style={{ fontSize: "16px", color: "#000", lineHeight: "1.4", height: "44px", overflow: "hidden", display: "-webkit-box", "-webkit-line-clamp": "2", "-webkit-box-orient": "vertical" }}>{product.name}</h3>
+                      {/* <p className="product-code">Mã SP: {product.ma_san_pham}</p> */}
+                      <p className="product-price" style={{ fontSize: "14px", color: "#000", lineHeight: "1.5" }}>{product.price.toLocaleString('vi-VN')}₫</p>
+                    </div>
                   </div>
-                  <div className="product-info">
-                    <h3 style={{ fontSize: "16px", color: "#000", lineHeight: "1.4", height: "44px", overflow: "hidden", display: "-webkit-box", "-webkit-line-clamp": "2", "-webkit-box-orient": "vertical" }}>{product.name}</h3>
-                    {/* <p className="product-code">Mã SP: {product.ma_san_pham}</p> */}
-                    <p className="product-price" style={{ fontSize: "14px", color: "#000", lineHeight: "1.5" }}>{product.price.toLocaleString('vi-VN')}₫</p>
-                  </div>
+                ))
+              ) : (
+                <div className="no-products-message">
+                  <p>Không có sản phẩm nào</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>

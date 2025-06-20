@@ -96,6 +96,27 @@
   animation: slideIn 0.5s ease-out;
 }
 
+/* No products message styles */
+.no-products-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  width: 100%;
+  text-align: center;
+  animation: fadeIn 0.6s ease-out;
+  padding: 40px 20px;
+}
+
+.no-products-message p {
+  font-size: 14px;
+  color: #888;
+  font-weight: 400;
+  margin: 0;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+}
+
 /* Staggered animation for filter sections */
 .filter-section {
   opacity: 0;

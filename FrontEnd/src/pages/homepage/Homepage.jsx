@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./homepage.css";
 import { Link, useNavigate } from "react-router-dom";
-import { getFeaturedEvents, getNewArrival } from '../../services/blogService';
+import { getFeaturedEvents, getNewArrival, getBannerBlog } from '../../services/blogService';
 import getPageInfo from "../../utils/pageInfo";
 
 const convertToPath = (name) => {
@@ -29,21 +29,7 @@ export default function Homepage() {
   const [newsEvents, setNewsEvents] = useState([]);
   const [eventsTechnology, setEventsTechnology] = useState([]);
   const [newArrival, setNewArrival] = useState([]);
-  const slides = [
-    {
-      id: 1,
-      image: 'http://theme.hstatic.net/1000312752/1001368650/14/slideshow_2.jpg?v=68',
-    },
-    {
-      id: 2,
-      image: 'http://theme.hstatic.net/1000312752/1001368650/14/slideshow_3.jpg?v=68',
-    },
-    {
-      id: 3,
-      image: 'http://theme.hstatic.net/1000312752/1001368650/14/slideshow_4.jpg?v=68',
-    },
-  ];
-
+  const [slides, setSlides] = useState([]);
   const navigate = useNavigate();
 
   const handlePrevSlide = () => {
@@ -73,6 +59,11 @@ export default function Homepage() {
     });
     getNewArrival().then(data => {
       setNewArrival(data);
+      console.log(data);
+    });
+
+    getBannerBlog().then(data => {
+      setSlides(data);
       console.log(data);
     });
   }, []);
@@ -180,12 +171,12 @@ export default function Homepage() {
         <div className="slideshow-container">
           <div className="slideshow">
             {slides.map((slide, index) => (
-              <div
+              <Link to={`/blogs/${slide.type_id.link_title}/${slide.id}`}
                 key={slide.id}
                 className={`slide ${index === currentSlide ? 'active' : ''}`}
               >
-                <img src={slide.image} alt={`Slide ${slide.id}`} />
-              </div>
+                <img src={`http://localhost:8055/assets/${slide.image_cover.filename_disk}`} alt={`Slide ${slide.id}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              </Link>
             ))}
             <button className="nav-btn prev" onClick={handlePrevSlide}>
               {"<"}
@@ -230,7 +221,7 @@ export default function Homepage() {
 
         {/* Flash sale */}
         <div className="flash-sale-wrapper">
-          <a href="https://lining.com.vn/collections/pickleball" className="hover-zoom" title="PICKLEBALL">
+          <a href="/collection/pickleball" className="hover-zoom" title="PICKLEBALL">
             <img
               alt="flashsale_img.jpg"
               onError={(e) => e.target.style.display = 'none'}
@@ -244,15 +235,14 @@ export default function Homepage() {
 
         {/* Video */}
         <div className="video-section">
-          <div className="container">
-            <div className="video-wrapper">
+          <div className="video-wrapper">
+            <div className="video-frame">
               <iframe
                 src="https://www.youtube.com/embed/qdvT0n1pxOc?autoplay=0&controls=1&disablekb=0&playsinline=1&cc_load_policy=0&cc_lang_pref=auto&widget_referrer=https%3A%2F%2Flining.com.vn%2F&rel=0&showinfo=1&iv_load_policy=3&modestbranding=1&customControls=true&noCookie=false&enablejsapi=1&origin=https%3A%2F%2Flining.com.vn&widgetid=1&forigin=https%3A%2F%2Flining.com.vn%2F&aoriginsup=1&gporigin=https%3A%2F%2Flining.com.vn%2Fsearch%3Ftype%3Dproduct%26q%3Dqu%25E1%25BA%25A7n&vf=1"
                 title="Lining Video"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
-                className="video-frame"
               ></iframe>
             </div>
           </div>
@@ -273,34 +263,11 @@ export default function Homepage() {
                       className="readytowear-items pd-item"
                       key={index}
                       onClick={() => handleProductClick(item)}
-                      style={{
-                        cursor: 'pointer',
-                        transition: 'transform 0.2s ease-in-out',
-                        ':hover': {
-                          transform: 'translateY(-5px)'
-                        }
-                      }}
                     >
-                      <div
-                        className="readytowear-img"
-                        style={{
-                          width: 255,
-                          height: 255,
-                          overflow: 'hidden'
-                        }}
-                      >
+                      <div className="readytowear-img">
                         <img
                           src={`http://localhost:8055/assets/${item.image?.filename_disk || 'default-product.jpg'}`}
                           alt={item.name || 'Product image'}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            transition: 'transform 0.3s ease-in-out',
-                            ':hover': {
-                              transform: 'scale(1.05)'
-                            }
-                          }}
                           onError={(e) => {
                             e.target.onerror = null;
                             e.target.src = 'https://theme.hstatic.net/1000312752/1001368650/14/slideshow_4.jpg?v=68';
@@ -308,22 +275,10 @@ export default function Homepage() {
                         />
                       </div>
                       <div className="readytowear-desc">
-                        <h3 style={{
-                          margin: "10px 0px",
-                          fontSize: '16px',
-                          fontWeight: 500,
-                          color: '#333'
-                        }}>
+                        <h3>
                           {item.name}
                         </h3>
-                        <p
-                          style={{
-                            paddingBottom: 10,
-                            color: "#c54934",
-                            fontWeight: 600,
-                            fontSize: '15px'
-                          }}
-                        >
+                        <p>
                           {parseInt(item.price?.replace(/,/g, '')).toLocaleString('vi-VN')}₫
                         </p>
                       </div>
@@ -331,15 +286,7 @@ export default function Homepage() {
                   );
                 })}
               </div>
-              <div
-                style={{
-                  marginTop: 20,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-
-              >
+              <div className="readytowear-button-wrapper">
                 <button className="btn1" onClick={() => navigate('/collection/pickleball')}>Xem thêm</button>
               </div>
             </div>
@@ -355,7 +302,7 @@ export default function Homepage() {
               <div className="blog-review-list">
                 {newsEvents.map((item, index) => {
                   return (
-                    <div className="blog-review-items" key={index}>
+                    <Link to={`/blogs/${item.type_id.link_title}/${item.id}`} className="blog-review-items" key={index}>
                       <div
                         className="blog-review-img"
                         style={{ width: "100%", height: "200px" }}
@@ -370,7 +317,7 @@ export default function Homepage() {
                           }}
                         />
                       </div>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
@@ -379,10 +326,7 @@ export default function Homepage() {
 
         </div>
         <div className="homeblog">
-          <div
-            className="container"
-            style={{ backgroundColor: "transparent" }}
-          >
+          <div className="container">
             <div className="homeblog_title">
               <h2 className="cnsp_title title--line"> TIN TỨC SẢN PHẨM
               </h2>
@@ -392,29 +336,18 @@ export default function Homepage() {
 
                 {eventsTechnology.map((item, index) => {
                   return (
-                    <Link to={`/blogs/cong-nghe-san-pham/${item.id}`} className="homeblog_item" key={index} style={{ textDecoration: "none", color: "inherit" }}>
-                      <div className="homeblog_img" >
+                    <Link to={`/blogs/cong-nghe-san-pham/${item.id}`} className="homeblog_item" key={index}>
+                      <div className="homeblog_img">
                         <img
                           src={`http://localhost:8055/assets/${item.image_cover.filename_disk}`}
                           alt="homeblog-item-img"
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
                         />
                       </div>
                       <div className="text-item-homelog">
-                        <p
-                          style={{
-                            fontSize: 20,
-                            lineHeight: "1.5",
-                            marginBottom: 8,
-                          }}
-                        >
+                        <p>
                           {item.title}
                         </p>
-                        <h2 style={{ fontSize: 16, lineHeight: "1.5" }}>
+                        <h2>
                           {item.description}
                         </h2>
                       </div>
@@ -422,12 +355,9 @@ export default function Homepage() {
                   );
                 })}
               </div>
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                {/* const breadcrumbItems = [
-                  { label: 'Blog', path: '/blogs/cong-nghe-san-pham' }
-                ]; */}
-                <Link to="/blogs/cong-nghe-san-pham" label="Blog" path="/blogs/cong-nghe-san-pham">
-                  <button className="btn1" style={{ marginTop: 20 }}>Xem tất cả</button>
+              <div className="homeblog-button-wrapper">
+                <Link to="/blogs/cong-nghe-san-pham">
+                  <button className="btn1">Xem tất cả</button>
                 </Link>
               </div>
             </div>
